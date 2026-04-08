@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Connexion par code — GetShitDone{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="text-center">
+        <h1 class="text-2xl font-bold">Connexion par code</h1>
+        <p class="text-gray-500 text-sm mt-1">Recevez un code à usage unique par email.</p>
+    </div>
+
+    {% if step == "send_code" %}
+    <!-- Étape 1 : saisie de l'email -->
+    <form method="POST" class="space-y-4">
+        <input type="hidden" name="action" value="send_code">
+        <div>
+            <label for="email" class="block text-sm font-medium mb-1">Email</label>
+            <input type="email" id="email" name="email" required autofocus
+                   value="{{ email }}"
+                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm
+                          focus:outline-none focus:ring-2 focus:ring-black">
+        </div>
+        <button type="submit"
+                class="w-full bg-black text-white rounded-lg py-2 text-sm font-medium
+                       hover:bg-gray-800 transition-colors">
+            Envoyer le code
+        </button>
+    </form>
+
+    {% else %}
+    <!-- Étape 2 : saisie du code reçu -->
+    <form method="POST" class="space-y-4">
+        <input type="hidden" name="action" value="verify_code">
+        <input type="hidden" name="email" value="{{ email }}">
+
+        <p class="text-sm text-center text-gray-600">
+            Code envoyé à <strong>{{ email }}</strong>.
+        </p>
+
+        <div>
+            <label for="code" class="block text-sm font-medium mb-1">Code de connexion</label>
+            <input type="text" id="code" name="code" required autofocus
+                   maxlength="6" pattern="\d{6}" inputmode="numeric"
+                   placeholder="000000"
+                   class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-center
+                          tracking-widest text-lg font-mono
+                          focus:outline-none focus:ring-2 focus:ring-black">
+        </div>
+
+        <button type="submit"
+                class="w-full bg-black text-white rounded-lg py-2 text-sm font-medium
+                       hover:bg-gray-800 transition-colors">
+            Valider
+        </button>
+    </form>
+    {% endif %}
+
+    <p class="text-center text-sm text-gray-500">
+        <a href="{{ url_for('auth.login') }}" class="hover:underline">
+            ← Retour à la connexion classique
+        </a>
+    </p>
+</div>
+{% endblock %}

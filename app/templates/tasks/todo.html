@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Liste todo — GetShitDone{% endblock %}
+{% block main_class %}max-w-2xl mx-auto px-4 py-6{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <div class="flex items-center justify-between">
+        <div>
+            <a href="{{ url_for('tasks.index') }}" class="text-xs text-gray-400 hover:text-gray-700">← Retour</a>
+            <h1 class="text-xl font-bold mt-1">Liste todo</h1>
+            <p class="text-xs text-gray-400">
+                {{ tasks | length }} tâche{% if tasks | length > 1 %}s{% endif %} active{% if tasks | length > 1 %}s{% endif %}
+            </p>
+        </div>
+    </div>
+
+    {% if tasks %}
+    <ul class="space-y-2">
+        {% for task in tasks %}
+        <li class="bg-white rounded-xl border border-gray-200 flex items-start gap-3 px-4 py-3"
+            id="task-{{ task.id }}">
+
+            <!-- Bouton complétion -->
+            <button onclick="completeTask({{ task.id }})"
+                    class="mt-0.5 w-4 h-4 rounded-full border-2 border-gray-300
+                           hover:border-black flex-shrink-0 transition-colors"
+                    title="Marquer comme fait"></button>
+
+            <!-- Contenu -->
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium">{{ task.title }}</p>
+                {% if task.description %}
+                <p class="text-xs text-gray-400 mt-0.5">{{ task.description }}</p>
+                {% endif %}
+
+                <div class="flex flex-wrap items-center gap-2 mt-1">
+                    <!-- Urgence -->
+                    {% if task.urgency_level > 0 %}
+                    <span class="text-xs px-1.5 py-0.5 rounded font-medium
+                        {% if task.urgency_level == 4 %}bg-red-600 text-white
+                        {% elif task.urgency_level == 3 %}bg-orange-100 text-orange-700
+                        {% elif task.urgency_level == 2 %}bg-yellow-100 text-yellow-700
+                        {% else %}bg-gray-100 text-gray-500{% endif %}">
+                        {{ task.urgency_label }}
+                    </span>
+                    {% endif %}
+
+                    <!-- Priorité -->
+                    {% if task.priority > 0 %}
+                    <span class="text-xs text-gray-400">{{ task.priority_label }}</span>
+                    {% endif %}
+
+                    <!-- Deadline -->
+                    {% if task.deadline %}
+                    <span class="text-xs text-gray-400 flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none"
+                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7
+                                     a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        {{ task.deadline }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Bouton archiver -->
+            <button onclick="archiveTask({{ task.id }})"
+                    class="text-gray-200 hover:text-gray-500 flex-shrink-0 mt-0.5 transition-colors"
+                    title="Archiver">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8l1 12
+                             a2 2 0 002 2h8a2 2 0 002-2L19 8m-9 4v4m4-4v4"/>
+                </svg>
+            </button>
+        </li>
+        {% endfor %}
+    </ul>
+
+    {% else %}
+    <div class="text-center py-16 text-gray-400 space-y-2">
+        <p class="text-4xl">✅</p>
+        <p class="text-sm">Aucune tâche active. Beau travail !</p>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+async function completeTask(taskId) {
+    const response = await fetch(`/tasks/task/${taskId}/complete`, { method: 'POST' });
+    if (response.ok) {
+        const element = document.getElementById(`task-${taskId}`);
+        if (element) {
+            element.style.opacity = '0.3';
+            element.style.transition = 'opacity 0.3s';
+            setTimeout(() => element.remove(), 300);
+        }
+    }
+}
+
+async function archiveTask(taskId) {
+    const response = await fetch(`/tasks/task/${taskId}/archive`, { method: 'POST' });
+    if (response.ok) {
+        const element = document.getElementById(`task-${taskId}`);
+        if (element) {
+            element.style.opacity = '0.3';
+            element.style.transition = 'opacity 0.3s';
+            setTimeout(() => element.remove(), 300);
+        }
+    }
+}
+</script>
+{% endblock %}

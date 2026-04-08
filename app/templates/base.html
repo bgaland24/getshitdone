@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GetShitDone{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+
+    <!-- Barre de navigation -->
+    {% if user is defined and user %}
+    <nav class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+        <a href="{{ url_for('lobby.lobby') }}" class="font-bold text-lg tracking-tight">GetShitDone</a>
+        <form method="POST" action="{{ url_for('auth.logout') }}">
+            <button type="submit"
+                    class="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                Déconnexion
+            </button>
+        </form>
+    </nav>
+    {% endif %}
+
+    <!-- Messages flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="max-w-lg mx-auto mt-4 px-4 space-y-2">
+        {% for category, message in messages %}
+        <div class="px-4 py-3 rounded-lg text-sm font-medium
+            {% if category == 'error' %}bg-red-100 text-red-800
+            {% elif category == 'success' %}bg-green-100 text-green-800
+            {% else %}bg-blue-100 text-blue-800{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Contenu principal -->
+    <main class="{% block main_class %}max-w-lg mx-auto px-4 py-8{% endblock %}">
+        {% block content %}{% endblock %}
+    </main>
+
+</body>
+</html>
