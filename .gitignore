@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+venv/
+.venv/
+env/
+*.db
+*.sqlite
+*.sqlite3
+
+# Secrets — ne jamais committer
+backend/wsgi.py
+.env
+*.env
+
+# Frontend — fichiers générés
+frontend/node_modules/
+frontend/dist/
+backend/static/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

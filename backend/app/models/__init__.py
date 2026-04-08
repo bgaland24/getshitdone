@@ -1,0 +1,12 @@
+"""
+Exports de tous les modèles SQLAlchemy.
+Importé par la factory Flask pour que SQLAlchemy découvre les tables avant create_all().
+"""
+
+from app.models.user import User
+from app.models.category import Category
+from app.models.deliverable import Deliverable
+from app.models.task import Task
+from app.models.work_session import WorkSession
+
+__all__ = ["User", "Category", "Deliverable", "Task", "WorkSession"]

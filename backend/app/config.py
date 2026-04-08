@@ -1,0 +1,45 @@
+"""
+Configuration de l'application Flask.
+Les valeurs sensibles sont injectées via les variables d'environnement définies dans wsgi.py.
+"""
+
+import os
+
+
+class Config:
+    """Configuration de base partagée entre tous les environnements."""
+
+    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "dev-jwt-secret-change-in-production")
+
+    # Durée de validité des tokens JWT
+    JWT_ACCESS_TOKEN_EXPIRY_HOURS = 24
+    JWT_REFRESH_TOKEN_EXPIRY_DAYS = 30
+
+    # SQLAlchemy
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+
+class DevelopmentConfig(Config):
+    """Configuration pour le développement local."""
+
+    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "DATABASE_URL", "sqlite:///intentionality_dev.db"
+    )
+
+
+class ProductionConfig(Config):
+    """Configuration pour la production (PythonAnywhere)."""
+
+    DEBUG = False
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "DATABASE_URL", "sqlite:///intentionality.db"
+    )
+
+
+# Mapping nom → classe de config
+CONFIG_MAP = {
+    "development": DevelopmentConfig,
+    "production": ProductionConfig,
+}
