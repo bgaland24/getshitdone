@@ -12,6 +12,7 @@ from app.database import db as _db
 def app():
     """Crée l'application en mode test avec base en mémoire."""
     import os
+    original_db_url = os.environ.get("DATABASE_URL")
     os.environ["FLASK_ENV"] = "development"
     os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 
@@ -23,6 +24,12 @@ def app():
         _db.create_all()
         yield application
         _db.drop_all()
+
+    # Restaure la variable d'environnement pour ne pas polluer les processus suivants
+    if original_db_url is not None:
+        os.environ["DATABASE_URL"] = original_db_url
+    else:
+        os.environ.pop("DATABASE_URL", None)
 
 
 @pytest.fixture

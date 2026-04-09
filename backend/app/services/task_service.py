@@ -4,24 +4,14 @@ Centralise les transitions de statut, la validation des règles métier
 et les opérations sur les sessions de travail.
 """
 
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone, timedelta, date as date_type
 
 from app.database import db
 from app.models.task import Task, TASK_STATUSES
 from app.models.work_session import WorkSession
 
-# Transitions de statut autorisées : {statut_source: [statuts_cibles_autorisés]}
-ALLOWED_TRANSITIONS = {
-    "unorganized": ["backlog"],
-    "backlog": ["today", "cancelled"],
-    "today": ["in_progress", "backlog", "cancelled"],
-    "in_progress": ["today", "done"],
-    "done": [],
-    "cancelled": [],
-}
-
-# Nombre maximal de tâches autorisées en statut today pour une même priority_date
-MAX_TODAY_TASKS = 3
+# Nombre maximal de tâches épinglées par date
+MAX_PINNED_PER_DATE = 3
 
 # Délai en minutes pour considérer une session "efficient"
 EFFICIENT_CLOSE_WINDOW_MINUTES = 5
@@ -32,16 +22,14 @@ class TaskService:
 
     def create_task(self, user_id: str, title: str, category_id: str = None, deliverable_id: str = None) -> Task:
         """
-        Crée une nouvelle tâche.
-        Statut initial : 'backlog' si catégorie fournie, 'unorganized' sinon.
+        Crée une nouvelle tâche avec le statut initial 'new'.
         """
-        initial_status = "backlog" if category_id else "unorganized"
         task = Task(
             user_id=user_id,
             title=title,
             category_id=category_id,
             deliverable_id=deliverable_id,
-            status=initial_status,
+            status="new",
         )
         db.session.add(task)
         db.session.commit()
@@ -55,42 +43,45 @@ class TaskService:
         modifiable_fields = {
             "title", "category_id", "deliverable_id",
             "urgency", "importance", "horizon",
-            "delegation", "estimated_minutes", "priority_date",
+            "delegation", "estimated_minutes",
         }
-
         qualification_fields = {"urgency", "importance", "horizon"}
-        needs_qualification_recalc = False
 
         for field, value in data.items():
             if field not in modifiable_fields:
                 continue
             setattr(task, field, value)
             if field in qualification_fields:
-                needs_qualification_recalc = True
-
-        # Si la catégorie est maintenant renseignée et la tâche était non organisée, on la fait passer en backlog
-        if "category_id" in data and data["category_id"] and task.status == "unorganized":
-            task.status = "backlog"
-
-        if needs_qualification_recalc:
-            task.recalculate_is_qualified()
+                task.recalculate_is_qualified()
 
         db.session.commit()
         return task
 
-    def qualify_task(self, task: Task, urgency: str, importance: str, horizon: str, delegation: str = None) -> Task:
+    def qualify_task(
+        self,
+        task: Task,
+        urgency: str,
+        importance: str,
+        horizon: str,
+        delegation: str = None,
+        category_id: str = None,
+        deliverable_id: str = None,
+        estimated_minutes=None,
+    ) -> Task:
         """
         Applique les critères de qualification à une tâche et recalcule is_qualified.
-        Lève ValueError si les valeurs sont invalides.
+        Lève ValueError si les valeurs de qualification sont invalides.
         """
-        from app.models.task import URGENCY_VALUES, IMPORTANCE_VALUES, HORIZON_VALUES, DELEGATION_VALUES
+        from app.models.task import URGENCY_VALUES, IMPORTANCE_VALUES, DELEGATION_VALUES
 
         if urgency not in URGENCY_VALUES:
             raise ValueError(f"Urgence invalide. Valeurs acceptées : {URGENCY_VALUES}")
         if importance not in IMPORTANCE_VALUES:
             raise ValueError(f"Importance invalide. Valeurs acceptées : {IMPORTANCE_VALUES}")
-        if horizon not in HORIZON_VALUES:
-            raise ValueError(f"Horizon invalide. Valeurs acceptées : {HORIZON_VALUES}")
+        try:
+            date_type.fromisoformat(horizon)
+        except (ValueError, TypeError):
+            raise ValueError("Horizon invalide. Format attendu : YYYY-MM-DD")
         if delegation and delegation not in DELEGATION_VALUES:
             raise ValueError(f"Délégation invalide. Valeurs acceptées : {DELEGATION_VALUES}")
 
@@ -98,36 +89,57 @@ class TaskService:
         task.importance = importance
         task.horizon = horizon
         task.delegation = delegation
-        task.recalculate_is_qualified()
 
+        if category_id is not None:
+            task.category_id = category_id or None
+        if deliverable_id is not None:
+            task.deliverable_id = deliverable_id or None
+        if estimated_minutes is not None:
+            task.estimated_minutes = int(estimated_minutes) if estimated_minutes else None
+
+        task.recalculate_is_qualified()
         db.session.commit()
         return task
 
-    def prioritize_task(self, task: Task, priority_date, user_id: str) -> Task:
+    def pin_task(self, task: Task, pin_date: date_type, user_id: str) -> Task:
         """
-        Marque une tâche comme priorité pour une date donnée (statut → today).
-        Lève ValueError si la limite de 3 tâches today est atteinte.
+        Épingle une tâche sur une date donnée (statut → prioritized).
+        - priority_firstset_date : set uniquement au premier épinglage (immuable)
+        - priority_current_date  : date d'épinglage actuelle (modifiable)
+        Lève ValueError si la limite de MAX_PINNED_PER_DATE est atteinte pour cette date.
         """
-        today_count = Task.query.filter_by(
+        pinned_count = Task.query.filter_by(
             user_id=user_id,
-            status="today",
-            priority_date=priority_date,
-        ).count()
+            status="prioritized",
+        ).filter(Task.priority_current_date == pin_date).count()
 
-        if today_count >= MAX_TODAY_TASKS:
-            raise ValueError(f"Maximum {MAX_TODAY_TASKS} tâches prioritaires par jour")
+        if pinned_count >= MAX_PINNED_PER_DATE:
+            raise ValueError(f"Maximum {MAX_PINNED_PER_DATE} tâches épinglées par date")
 
-        task.status = "today"
-        task.priority_date = priority_date
+        task.priority_current_date = pin_date
+        if task.priority_firstset_date is None:
+            task.priority_firstset_date = pin_date
+
+        task.status = "prioritized"
+        db.session.commit()
+        return task
+
+    def unpin_task(self, task: Task) -> Task:
+        """
+        Désépingle une tâche.
+        - priority_current_date → null
+        - statut → 'in_progress' si sessions de travail existent, 'new' sinon
+        """
+        task.priority_current_date = None
+        task.status = "in_progress" if task.has_work_sessions() else "new"
         db.session.commit()
         return task
 
     def start_task(self, task: Task, user_id: str) -> WorkSession:
         """
-        Démarre une session de travail sur la tâche.
-        Lève ValueError si une autre session est déjà active.
+        Démarre une session de travail sur la tâche (statut → in_progress).
+        Lève ValueError si une autre session est déjà active pour cet utilisateur.
         """
-        # Vérifie qu'aucune autre session n'est en cours pour cet utilisateur
         active_session = (
             WorkSession.query
             .join(Task, WorkSession.task_id == Task.id)
@@ -145,7 +157,7 @@ class TaskService:
 
     def pause_task(self, task: Task, user_id: str) -> WorkSession:
         """
-        Met en pause la session active sur la tâche (statut → today).
+        Met en pause la session active (statut → prioritized si épinglée, sinon in_progress).
         Lève ValueError si aucune session active n'est trouvée.
         """
         session = self._get_active_session(task.id)
@@ -156,7 +168,8 @@ class TaskService:
         session.stopped_at = now
         session.duration_minutes = _calculate_duration_minutes(session.started_at, now)
 
-        task.status = "today"
+        # Si la tâche est épinglée, on revient à prioritized ; sinon in_progress
+        task.status = "prioritized" if task.priority_current_date else "in_progress"
         db.session.commit()
         return session
 
@@ -171,10 +184,8 @@ class TaskService:
         if session:
             session.stopped_at = now
             session.duration_minutes = _calculate_duration_minutes(session.started_at, now)
-            # efficient = tâche closée dans les 5 min après fin de session
             session.efficient = True
 
-        # Marque toutes les sessions récentes comme efficient si applicable
         self._mark_recent_sessions_efficient(task.id, now)
 
         task.status = "done"
@@ -183,34 +194,16 @@ class TaskService:
         return task
 
     def cancel_task(self, task: Task) -> Task:
-        """Annule une tâche (statut → cancelled)."""
-        if task.status not in ("backlog", "today"):
-            raise ValueError("Seules les tâches en backlog ou today peuvent être annulées")
+        """
+        Annule une tâche (statut → cancelled).
+        Autorisé depuis 'new', 'prioritized' ou 'in_progress'.
+        """
+        if task.status not in ("new", "prioritized", "in_progress"):
+            raise ValueError("Seules les tâches new, prioritized ou in_progress peuvent être annulées")
 
         task.status = "cancelled"
         db.session.commit()
         return task
-
-    def prepare_tomorrow(self, user_id: str) -> dict:
-        """
-        Remet toutes les tâches 'today' non done de l'utilisateur en 'backlog'.
-        Enregistre la date dans missed_dates pour chaque tâche reportée.
-        Retourne le nombre de tâches remises en backlog.
-        """
-        today_str = datetime.now(timezone.utc).date().isoformat()
-        tasks_to_reset = Task.query.filter_by(
-            user_id=user_id, status="today"
-        ).all()
-
-        count_reset = 0
-        for task in tasks_to_reset:
-            task.add_missed_date(today_str)
-            task.status = "backlog"
-            task.priority_date = None
-            count_reset += 1
-
-        db.session.commit()
-        return {"tasks_reset": count_reset}
 
     def _get_active_session(self, task_id: str):
         """Récupère la session de travail active (non clôturée) d'une tâche."""
@@ -235,7 +228,6 @@ class TaskService:
 
 def _calculate_duration_minutes(started_at: datetime, stopped_at: datetime) -> int:
     """Calcule la durée en minutes entre deux timestamps."""
-    # Normalise les deux timestamps pour la comparaison
     if started_at.tzinfo is None:
         started_at = started_at.replace(tzinfo=timezone.utc)
     if stopped_at.tzinfo is None:

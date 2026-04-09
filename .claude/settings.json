@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find \"c:/Users/basti/Documents/repo/getshitdone/backend\" -type d -name \"__pycache__\" -exec rm -rf {} +)"
+    ]
+  }
+}

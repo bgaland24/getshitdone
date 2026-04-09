@@ -6,6 +6,7 @@ from flask import Blueprint, request, g
 
 from app.database import db
 from app.models.category import Category
+from app.models.task import Task
 from app.utils.auth_decorator import require_auth
 from app.utils.response import success, error
 
@@ -77,10 +78,20 @@ def update_category(category_id):
 @categories_blueprint.delete("/<category_id>")
 @require_auth
 def delete_category(category_id):
-    """Supprime une catégorie et toutes ses données associées."""
+    """
+    Supprime une catégorie.
+    Les tâches associées perdent leur category_id et deliverable_id
+    (les livrables de la catégorie sont aussi supprimés par cascade).
+    """
     category = _get_user_category(category_id)
     if not category:
         return error("Catégorie introuvable", 404)
+
+    # Nullifier les tâches qui appartiennent à cette catégorie
+    # avant que SQLAlchemy cascade-delete les livrables
+    Task.query.filter_by(category_id=category_id).update(
+        {"category_id": None, "deliverable_id": None}
+    )
 
     db.session.delete(category)
     db.session.commit()

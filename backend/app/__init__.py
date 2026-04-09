@@ -34,11 +34,13 @@ def create_app(config_name: str = None) -> Flask:
     # Enregistrement des blueprints
     _register_blueprints(flask_app)
 
-    # Création des tables si elles n'existent pas
+    # Création des tables si elles n'existent pas + migrations
     with flask_app.app_context():
         # Import des modèles pour que SQLAlchemy les découvre
         import app.models  # noqa: F401
         db.create_all()
+        from app.migrations import run_migrations
+        run_migrations()
 
     # Route catch-all : sert le frontend React pour toutes les routes non-API
     @flask_app.route("/", defaults={"path": ""})
@@ -63,6 +65,7 @@ def _register_blueprints(flask_app: Flask) -> None:
     from app.routes.tasks import tasks_blueprint
     from app.routes.sessions import sessions_blueprint
     from app.routes.scores import scores_blueprint
+    from app.routes.preferences import preferences_blueprint
 
     flask_app.register_blueprint(auth_blueprint)
     flask_app.register_blueprint(categories_blueprint)
@@ -70,3 +73,4 @@ def _register_blueprints(flask_app: Flask) -> None:
     flask_app.register_blueprint(tasks_blueprint)
     flask_app.register_blueprint(sessions_blueprint)
     flask_app.register_blueprint(scores_blueprint)
+    flask_app.register_blueprint(preferences_blueprint)

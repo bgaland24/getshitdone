@@ -8,5 +8,6 @@ from app.models.category import Category
 from app.models.deliverable import Deliverable
 from app.models.task import Task
 from app.models.work_session import WorkSession
+from app.models.user_preferences import UserPreferences
 
-__all__ = ["User", "Category", "Deliverable", "Task", "WorkSession"]
+__all__ = ["User", "Category", "Deliverable", "Task", "WorkSession", "UserPreferences"]

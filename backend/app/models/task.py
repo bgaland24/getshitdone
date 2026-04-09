@@ -4,17 +4,16 @@ Toute intention d'action se traduit en tâche.
 """
 
 import uuid
-import json
 from datetime import datetime, timezone
 
 from app.database import db
 
 
 # Valeurs autorisées pour les champs enum
-TASK_STATUSES = ("unorganized", "backlog", "today", "in_progress", "done", "cancelled")
+TASK_STATUSES = ("new", "prioritized", "in_progress", "done", "cancelled")
 URGENCY_VALUES = ("urgent", "non_urgent")
 IMPORTANCE_VALUES = ("important", "non_important")
-HORIZON_VALUES = ("day", "week", "month")
+# horizon est une date ISO (YYYY-MM-DD) — ex: "2026-04-10"
 DELEGATION_VALUES = ("delegable", "non_delegable", "delegated")
 
 
@@ -32,7 +31,7 @@ class Task(db.Model):
     deliverable_id = db.Column(db.String(36), db.ForeignKey("deliverables.id"), nullable=True)
 
     # Cycle de vie
-    status = db.Column(db.String(20), nullable=False, default="unorganized")
+    status = db.Column(db.String(20), nullable=False, default="new")
 
     # Critères de qualification (obligatoires pour is_qualified = True)
     urgency = db.Column(db.String(20), nullable=True)
@@ -44,7 +43,11 @@ class Task(db.Model):
 
     # Planification
     estimated_minutes = db.Column(db.Integer, nullable=True)
-    priority_date = db.Column(db.Date, nullable=True)
+
+    # Épinglage — priority_firstset_date : date du premier épinglage (immuable)
+    # priority_current_date : date d'épinglage actuelle (null si non épinglée)
+    priority_firstset_date = db.Column(db.Date, nullable=True)
+    priority_current_date = db.Column(db.Date, nullable=True)
 
     # is_qualified est recalculé à chaque modification des critères
     is_qualified = db.Column(db.Boolean, nullable=False, default=False)
@@ -54,9 +57,6 @@ class Task(db.Model):
         db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)
     )
     done_at = db.Column(db.DateTime, nullable=True)
-
-    # Dates où la tâche était today mais non faite (stocké en JSON)
-    missed_dates = db.Column(db.Text, nullable=False, default="[]")
 
     # Relations
     user = db.relationship("User", back_populates="tasks")
@@ -70,16 +70,9 @@ class Task(db.Model):
         """Recalcule is_qualified selon la règle : urgency + importance + horizon tous renseignés."""
         self.is_qualified = bool(self.urgency and self.importance and self.horizon)
 
-    def get_missed_dates(self):
-        """Désérialise la liste des dates manquées."""
-        return json.loads(self.missed_dates)
-
-    def add_missed_date(self, date_str: str):
-        """Ajoute une date à la liste des dates manquées."""
-        dates = self.get_missed_dates()
-        if date_str not in dates:
-            dates.append(date_str)
-            self.missed_dates = json.dumps(dates)
+    def has_work_sessions(self) -> bool:
+        """Retourne True si la tâche a au moins une session de travail."""
+        return bool(self.work_sessions)
 
     def to_dict(self):
         """Sérialise la tâche avec tous ses attributs."""
@@ -95,9 +88,9 @@ class Task(db.Model):
             "horizon": self.horizon,
             "delegation": self.delegation,
             "estimated_minutes": self.estimated_minutes,
-            "priority_date": self.priority_date.isoformat() if self.priority_date else None,
+            "priority_firstset_date": self.priority_firstset_date.isoformat() if self.priority_firstset_date else None,
+            "priority_current_date": self.priority_current_date.isoformat() if self.priority_current_date else None,
             "is_qualified": self.is_qualified,
             "created_at": self.created_at.isoformat(),
             "done_at": self.done_at.isoformat() if self.done_at else None,
-            "missed_dates": self.get_missed_dates(),
         }

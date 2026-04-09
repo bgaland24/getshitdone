@@ -23,6 +23,7 @@ class User(db.Model):
     # Relations
     categories = db.relationship("Category", back_populates="user", cascade="all, delete-orphan")
     tasks = db.relationship("Task", back_populates="user", cascade="all, delete-orphan")
+    preferences = db.relationship("UserPreferences", back_populates="user", uselist=False, cascade="all, delete-orphan")
 
     def to_dict(self):
         """Sérialise l'utilisateur sans exposer le mot de passe."""

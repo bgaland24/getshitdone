@@ -7,6 +7,7 @@ from flask import Blueprint, request, g
 from app.database import db
 from app.models.deliverable import Deliverable
 from app.models.category import Category
+from app.models.task import Task
 from app.utils.auth_decorator import require_auth
 from app.utils.response import success, error
 
@@ -61,17 +62,37 @@ def create_deliverable():
 @deliverables_blueprint.put("/<deliverable_id>")
 @require_auth
 def update_deliverable(deliverable_id):
-    """Modifie le nom d'un livrable."""
+    """
+    Modifie un livrable : nom et/ou catégorie.
+    Si la catégorie change, les tâches associées à ce livrable
+    sont mises à jour avec la nouvelle catégorie.
+    """
     deliverable = _get_user_deliverable(deliverable_id)
     if not deliverable:
         return error("Livrable introuvable", 404)
 
     data = request.get_json(silent=True) or {}
+
     if "name" in data:
         name = data["name"].strip()
         if not name:
             return error("Le nom ne peut pas être vide")
         deliverable.name = name
+
+    if "category_id" in data:
+        new_category_id = data["category_id"]
+        # Vérifie que la nouvelle catégorie appartient à l'utilisateur
+        new_category = Category.query.filter_by(
+            id=new_category_id, user_id=g.current_user.id
+        ).first()
+        if not new_category:
+            return error("Catégorie de destination introuvable", 404)
+
+        # Mettre à jour les tâches qui pointent vers ce livrable
+        Task.query.filter_by(deliverable_id=deliverable_id).update(
+            {"category_id": new_category_id}
+        )
+        deliverable.category_id = new_category_id
 
     db.session.commit()
     return success(deliverable.to_dict())
@@ -80,10 +101,18 @@ def update_deliverable(deliverable_id):
 @deliverables_blueprint.delete("/<deliverable_id>")
 @require_auth
 def delete_deliverable(deliverable_id):
-    """Supprime un livrable."""
+    """
+    Supprime un livrable.
+    Les tâches associées perdent leur deliverable_id mais conservent leur catégorie.
+    """
     deliverable = _get_user_deliverable(deliverable_id)
     if not deliverable:
         return error("Livrable introuvable", 404)
+
+    # Nullifier le deliverable_id des tâches (la catégorie est conservée)
+    Task.query.filter_by(deliverable_id=deliverable_id).update(
+        {"deliverable_id": None}
+    )
 
     db.session.delete(deliverable)
     db.session.commit()
