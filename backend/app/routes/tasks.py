@@ -228,6 +228,22 @@ def complete_task(task_id):
     return success(task.to_dict())
 
 
+@tasks_blueprint.post("/<task_id>/undone")
+@require_auth
+def reopen_task(task_id):
+    """Remet la tâche en new (annule le statut done)."""
+    task = _get_user_task(task_id)
+    if not task:
+        return error("Tâche introuvable", 404)
+
+    try:
+        task = task_service.reopen_task(task)
+    except ValueError as e:
+        return error(str(e), 422)
+
+    return success(task.to_dict())
+
+
 @tasks_blueprint.post("/<task_id>/cancel")
 @require_auth
 def cancel_task(task_id):

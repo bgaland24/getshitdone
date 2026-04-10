@@ -37,15 +37,24 @@ export function CaptureScreen() {
   async function handleAdd() {
     const trimmed = title.trim()
     if (!trimmed || submitting) return
+
+    /* Découpe sur ";" et ignore les segments vides */
+    const titles = trimmed.split(';').map((s) => s.trim()).filter(Boolean)
+    if (titles.length === 0) return
+
     setSubmitting(true)
     try {
-      const task = await createTask({
-        title: trimmed,
-        category_id: selectedCategoryId || null,
-        deliverable_id: selectedDeliverableId || null,
-      })
-      addTask(task)
-      setRecentCaptures((prev) => [task, ...prev.slice(0, 4)])
+      const tasks = await Promise.all(
+        titles.map((t) =>
+          createTask({
+            title: t,
+            category_id: selectedCategoryId || null,
+            deliverable_id: selectedDeliverableId || null,
+          })
+        )
+      )
+      tasks.forEach(addTask)
+      setRecentCaptures((prev) => [...tasks.reverse(), ...prev].slice(0, 5))
       setTitle('')
       setSelectedCategoryId('')
       setSelectedDeliverableId('')
@@ -124,7 +133,7 @@ export function CaptureScreen() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-            placeholder="Nouvelle tâche…"
+            placeholder="Nouvelle tâche (séparées par des ;)…"
             disabled={submitting}
             style={{
               width: '100%',

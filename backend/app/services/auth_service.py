@@ -30,6 +30,13 @@ class AuthService:
         user = User(email=email, password_hash=password_hash)
         db.session.add(user)
         db.session.commit()
+
+        # Données de démonstration pour le premier lancement (désactivé en mode test)
+        import os
+        if os.environ.get("ONBOARDING_DISABLED") != "1":
+            from app.services.onboarding_service import OnboardingService
+            OnboardingService().seed_demo_data(user.id)
+
         return user
 
     def login(self, email: str, password: str) -> User:

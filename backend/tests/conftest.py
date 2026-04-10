@@ -1,35 +1,34 @@
 """
 Configuration pytest — fixtures partagées entre tous les tests.
-Utilise une base SQLite en mémoire pour l'isolation.
+Utilise la base de données de test dédiée (intentionality_test.db).
+
+Stratégie d'isolation :
+- Chaque test vide toutes les tables après son exécution (DELETE rapide)
+- Les tests créent leurs propres données — pas de dépendance au seed
+- Le seed (seed.py) est réservé aux tests E2E Playwright
 """
 
+import os
 import pytest
+
+# Force la BDD de test avant tout import de l'app
+os.environ["DATABASE_URL"] = "sqlite:///intentionality_test.db"
+os.environ["FLASK_ENV"] = "development"
+
 from app import create_app
 from app.database import db as _db
 
 
 @pytest.fixture(scope="session")
 def app():
-    """Crée l'application en mode test avec base en mémoire."""
-    import os
-    original_db_url = os.environ.get("DATABASE_URL")
-    os.environ["FLASK_ENV"] = "development"
-    os.environ["DATABASE_URL"] = "sqlite:///:memory:"
-
+    """Crée l'application pointant sur intentionality_test.db."""
     application = create_app("development")
     application.config["TESTING"] = True
-    application.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
 
     with application.app_context():
         _db.create_all()
         yield application
         _db.drop_all()
-
-    # Restaure la variable d'environnement pour ne pas polluer les processus suivants
-    if original_db_url is not None:
-        os.environ["DATABASE_URL"] = original_db_url
-    else:
-        os.environ.pop("DATABASE_URL", None)
 
 
 @pytest.fixture
@@ -40,7 +39,7 @@ def client(app):
 
 @pytest.fixture(autouse=True)
 def clean_db(app):
-    """Vide les tables entre chaque test pour garantir l'isolation."""
+    """Vide toutes les tables après chaque test pour garantir l'isolation."""
     with app.app_context():
         yield
         _db.session.rollback()

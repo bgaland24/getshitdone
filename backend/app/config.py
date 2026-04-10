@@ -24,9 +24,9 @@ class DevelopmentConfig(Config):
     """Configuration pour le développement local."""
 
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DATABASE_URL", "sqlite:///intentionality_dev.db"
-    )
+    # En mode E2E (tests Playwright), utilise une base séparée pour ne pas polluer la dev
+    _default_db = "sqlite:///intentionality_e2e.db" if os.environ.get("E2E_TESTING") else "sqlite:///intentionality_dev.db"
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", _default_db)
 
 
 class ProductionConfig(Config):

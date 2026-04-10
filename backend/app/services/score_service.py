@@ -82,11 +82,11 @@ class ScoreService:
         """
         since = datetime.now(timezone.utc) - timedelta(days=7)
 
-        # Tâches qui avaient status today avec priority_date dans la fenêtre (done ou missed)
+        # Tâches épinglées au moins une fois dans la fenêtre (priority_firstset_date)
         all_priority_tasks = Task.query.filter(
             Task.user_id == user_id,
-            Task.priority_date >= since.date(),
-            Task.priority_date <= datetime.now(timezone.utc).date(),
+            Task.priority_firstset_date >= since.date(),
+            Task.priority_firstset_date <= datetime.now(timezone.utc).date(),
         ).all()
 
         if not all_priority_tasks:
@@ -171,11 +171,11 @@ class ScoreService:
 
     def _compute_scores_for_period(self, user_id: str, week_start: date, week_end: date) -> dict:
         """Calcule les scores pour une semaine spécifique (historique)."""
-        # Priorités : tâches done avec priority_date dans la semaine
+        # Priorités : tâches épinglées au moins une fois dans la semaine
         priority_tasks = Task.query.filter(
             Task.user_id == user_id,
-            Task.priority_date >= week_start,
-            Task.priority_date <= week_end,
+            Task.priority_firstset_date >= week_start,
+            Task.priority_firstset_date <= week_end,
         ).all()
 
         if priority_tasks:

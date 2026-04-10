@@ -6,14 +6,15 @@
  */
 
 import { useEffect, useRef, useState } from 'react'
-import { fetchTasks, startTask, pauseTask, doneTask, pinTask, unpinTask } from '../api/tasks'
-import { fetchCategories } from '../api/categories'
+import { fetchTasks, startTask, pauseTask, doneTask, undoneTask, pinTask, unpinTask, qualifyTask } from '../api/tasks'
+import { fetchCategories, fetchDeliverables } from '../api/categories'
 import { fetchSessions } from '../api/sessions'
 import { fetchPreferences } from '../api/preferences'
 import { useTaskStore } from '../store/taskStore'
 import { Badge } from '../components/Badge'
+import { QualifyForm } from '../components/QualifyForm'
 import { getHorizonColor, getHorizonLabel, MAX_PINNED_PER_DATE } from '../constants'
-import type { Task, WorkSession, SortAxis, Category } from '../types'
+import type { Task, WorkSession, SortAxis, Category, QualifyTaskPayload } from '../types'
 
 type Mode = 'today' | 'tomorrow'
 
@@ -55,7 +56,8 @@ export function PrioritiesScreen() {
   const [activeSession, setActiveSession] = useState<WorkSession | null>(null)
   const [sortAxes, setSortAxes] = useState<SortAxis[]>(['horizon', 'delegation', 'urgency', 'importance'])
   const [loading, setLoading] = useState(false)
-  const { tasks, categories, setTasks, setCategories, updateTask: storeUpdate } = useTaskStore()
+  const [requalifyTask, setRequalifyTask] = useState<Task | null>(null)
+  const { tasks, categories, deliverables, setTasks, setCategories, setDeliverables, updateTask: storeUpdate } = useTaskStore()
 
   const todayStr    = modeDate('today')
   const tomorrowStr = modeDate('tomorrow')
@@ -80,10 +82,11 @@ export function PrioritiesScreen() {
   const canPin = pinnedCountForDate < MAX_PINNED_PER_DATE
 
   useEffect(() => {
-    Promise.all([fetchTasks(), fetchCategories(), fetchSessions({ date: todayStr }), fetchPreferences()])
-      .then(([t, c, sessions, prefs]) => {
+    Promise.all([fetchTasks(), fetchCategories(), fetchDeliverables(), fetchSessions({ date: todayStr }), fetchPreferences()])
+      .then(([t, c, d, sessions, prefs]) => {
         setTasks(t)
         setCategories(c)
+        setDeliverables(d)
         setActiveSession(sessions.find((s) => s.stopped_at === null) ?? null)
         setSortAxes(prefs.sort_axes)
       })
@@ -113,6 +116,20 @@ export function PrioritiesScreen() {
     try {
       storeUpdate(await doneTask(task.id))
       setActiveSession(null)
+    } finally { setLoading(false) }
+  }
+
+  async function handleUndone(task: Task) {
+    setLoading(true)
+    try { storeUpdate(await undoneTask(task.id)) }
+    finally { setLoading(false) }
+  }
+
+  async function handleRequalify(task: Task, payload: QualifyTaskPayload) {
+    setLoading(true)
+    try {
+      storeUpdate(await qualifyTask(task.id, payload))
+      setRequalifyTask(null)
     } finally { setLoading(false) }
   }
 
@@ -171,7 +188,9 @@ export function PrioritiesScreen() {
               onStart={handleStart}
               onPause={handlePause}
               onDone={handleDone}
+              onUndone={handleUndone}
               onUnpin={handleUnpin}
+              onRequalify={(t) => setRequalifyTask(t)}
             />
           ))}
         </section>
@@ -195,13 +214,16 @@ export function PrioritiesScreen() {
               task={task}
               category={categories.find((c) => c.id === task.category_id) ?? null}
               isPinned={false}
-              isActive={false}
-              activeSession={null}
+              isActive={task.status === 'in_progress'}
+              activeSession={task.status === 'in_progress' ? activeSession : null}
               loading={loading}
               canPin={canPin}
               onStart={handleStart}
+              onPause={handlePause}
               onDone={handleDone}
+              onUndone={handleUndone}
               onPin={handlePin}
+              onRequalify={(t) => setRequalifyTask(t)}
             />
           ))
         )}
@@ -237,6 +259,41 @@ export function PrioritiesScreen() {
           ))}
         </div>
       </div>
+
+      {/* Modal de requalification */}
+      {requalifyTask && (
+        <div
+          onClick={() => setRequalifyTask(null)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 200,
+            background: 'rgba(0,0,0,0.7)',
+            display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '100%', maxWidth: '480px',
+              background: '#111', borderRadius: '16px 16px 0 0',
+              padding: '20px 20px 40px',
+              borderTop: '1px solid #2a2a2a',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <span style={{ fontSize: '11px', color: '#555', fontWeight: 600, letterSpacing: '0.08em' }}>RE-QUALIFIER</span>
+              <button onClick={() => setRequalifyTask(null)} style={{ background: 'none', border: 'none', color: '#555', fontSize: '18px', cursor: 'pointer' }}>✕</button>
+            </div>
+            <p style={{ margin: '0 0 16px', fontSize: '13px', color: '#888' }}>{requalifyTask.title}</p>
+            <QualifyForm
+              task={requalifyTask}
+              categories={categories}
+              deliverables={deliverables}
+              onSubmit={(payload) => handleRequalify(requalifyTask, payload)}
+              loading={loading}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -254,8 +311,10 @@ function PriorityTaskCard({
   onStart,
   onPause,
   onDone,
+  onUndone,
   onPin,
   onUnpin,
+  onRequalify,
 }: {
   task: Task
   category: Category | null
@@ -267,8 +326,10 @@ function PriorityTaskCard({
   onStart: (t: Task) => void
   onPause?: (t: Task) => void
   onDone: (t: Task) => void
+  onUndone: (t: Task) => void
   onPin?: (t: Task) => void
   onUnpin?: (t: Task) => void
+  onRequalify: (t: Task) => void
 }) {
   const isDone = task.status === 'done'
   const catColor = category?.color ?? '#555'
@@ -326,49 +387,42 @@ function PriorityTaskCard({
         </div>
 
         {/* Actions */}
-        {!isDone && (
-          <div style={{ display: 'flex', gap: '5px', flexShrink: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-            {/* Épingler / désépingler */}
-            {isPinned && onUnpin && (
-              <button
-                onClick={() => onUnpin(task)}
-                disabled={loading}
-                title="Désépingler"
-                style={{ background: 'transparent', color: catColor, border: `1px solid ${catColor}44`, borderRadius: '5px', padding: '6px 8px', fontSize: '13px', cursor: 'pointer' }}
-              >
-                📌
-              </button>
-            )}
-            {!isPinned && onPin && (
-              <button
-                onClick={() => canPin && onPin(task)}
-                disabled={loading || !canPin}
-                title={canPin ? 'Épingler' : 'Maximum atteint'}
-                style={{ background: 'transparent', color: canPin ? '#888' : '#333', border: '1px solid #2a2a2a', borderRadius: '5px', padding: '6px 8px', fontSize: '13px', cursor: canPin ? 'pointer' : 'not-allowed' }}
-              >
-                📌
-              </button>
-            )}
-            {/* Timer */}
-            {!isActive && (
-              <button
-                onClick={() => onStart(task)}
-                disabled={loading}
-                style={{ background: catColor, color: '#000', border: 'none', borderRadius: '5px', padding: '6px 12px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}
-              >
-                ▶
-              </button>
-            )}
-            {isActive && onPause && (
-              <button
-                onClick={() => onPause(task)}
-                disabled={loading}
-                style={{ background: 'transparent', color: '#888', border: '1px solid #333', borderRadius: '5px', padding: '6px 8px', fontSize: '12px', cursor: 'pointer' }}
-              >
-                ⏸
-              </button>
-            )}
-            {/* Terminer */}
+        <div style={{ display: 'flex', gap: '5px', flexShrink: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          {/* Timer — bouton principal, large */}
+          {!isDone && !isActive && (
+            <button
+              onClick={() => onStart(task)}
+              disabled={loading}
+              style={{ background: catColor, color: '#000', border: 'none', borderRadius: '5px', padding: '6px 20px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', minWidth: '90px' }}
+            >
+              ▶ Démarrer
+            </button>
+          )}
+          {!isDone && isActive && onPause && (
+            <button
+              onClick={() => onPause(task)}
+              disabled={loading}
+              title="Mettre en pause"
+              style={{ background: 'transparent', color: '#aaa', border: '1px solid #444', borderRadius: '5px', padding: '6px 20px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', minWidth: '90px' }}
+            >
+              ⏸ Pause
+            </button>
+          )}
+
+          {/* Re-qualifier */}
+          {!isDone && (
+            <button
+              onClick={() => onRequalify(task)}
+              disabled={loading}
+              title="Re-qualifier cette tâche"
+              style={{ background: 'transparent', color: '#666', border: '1px solid #2a2a2a', borderRadius: '5px', padding: '6px 8px', fontSize: '12px', cursor: 'pointer' }}
+            >
+              ✎
+            </button>
+          )}
+
+          {/* Terminer / Rouvrir */}
+          {!isDone && (
             <button
               onClick={() => onDone(task)}
               disabled={loading}
@@ -376,10 +430,40 @@ function PriorityTaskCard({
             >
               ✓
             </button>
-          </div>
-        )}
+          )}
+          {isDone && (
+            <button
+              onClick={() => onUndone(task)}
+              disabled={loading}
+              title="Marquer comme non terminée"
+              style={{ background: 'transparent', color: '#555', border: '1px solid #2a2a2a', borderRadius: '5px', padding: '6px 10px', fontSize: '13px', cursor: 'pointer' }}
+            >
+              ↩
+            </button>
+          )}
 
-        {isDone && <span style={{ color: '#4CAF7D', fontSize: '16px' }}>✓</span>}
+          {/* Épingler / désépingler — toujours le plus à droite */}
+          {isPinned && onUnpin && (
+            <button
+              onClick={() => onUnpin(task)}
+              disabled={loading}
+              title="Désépingler"
+              style={{ background: 'transparent', color: catColor, border: `1px solid ${catColor}44`, borderRadius: '5px', padding: '6px 8px', fontSize: '13px', cursor: 'pointer' }}
+            >
+              📌
+            </button>
+          )}
+          {!isPinned && onPin && (
+            <button
+              onClick={() => canPin && onPin(task)}
+              disabled={loading || !canPin}
+              title={canPin ? 'Épingler' : 'Maximum atteint'}
+              style={{ background: 'transparent', color: canPin ? '#888' : '#333', border: '1px solid #2a2a2a', borderRadius: '5px', padding: '6px 8px', fontSize: '13px', cursor: canPin ? 'pointer' : 'not-allowed' }}
+            >
+              📌
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )

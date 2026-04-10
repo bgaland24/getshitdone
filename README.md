@@ -173,20 +173,18 @@ if path not in sys.path:
     sys.path.insert(0, path)
 
 # Variables d'environnement (secrets injectés en dur ici)
-os.environ['SECRET_KEY'] = 'REMPLACER_PAR_UNE_CLE_FORTE'
-os.environ['DATABASE_URL'] = 'sqlite:////home/<ton-username>/getshitdone/backend/prod.db'
 os.environ['FLASK_ENV'] = 'production'
+os.environ['SECRET_KEY'] = 'REMPLACER_PAR_UNE_CLE_FORTE'       # python -c "import secrets; print(secrets.token_urlsafe(32))"
+os.environ['JWT_SECRET_KEY'] = 'REMPLACER_PAR_UNE_CLE_FORTE'   # python -c "import secrets; print(secrets.token_urlsafe(32))"
+os.environ['DATABASE_URL'] = 'sqlite:////home/<ton-username>/getshitdone/backend/prod.db'
 
 from app import create_app
-application = create_app()
+application = create_app('production')
 ```
 
 ### Étape 5 — Initialiser la base de données
 
-```bash
-cd ~/getshitdone/backend
-flask db upgrade
-```
+La base est créée **automatiquement** au premier démarrage (via `db.create_all()` dans la factory Flask). Aucune commande manuelle nécessaire.
 
 ### Étape 6 — Configurer l'application web sur PythonAnywhere
 

@@ -4,7 +4,8 @@
  * Actions : Terminée · Déplacer · Qualifier · Supprimer.
  */
 
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import type { Task } from '../../types'
 
 interface TaskActionMenuProps {
@@ -33,19 +34,9 @@ const ITEM_STYLE: React.CSSProperties = {
 
 export function TaskActionMenu({ task, onDone, onOpenMove, onOpenQualify, onDelete }: TaskActionMenuProps) {
   const btnRef = useRef<HTMLButtonElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const [menuPos, setMenuPos] = useState<MenuPos | null>(null)
 
-  /* Ferme le menu si on clique ailleurs */
-  useEffect(() => {
-    if (!menuPos) return
-    function handleOutside(e: MouseEvent) {
-      if (btnRef.current && !btnRef.current.contains(e.target as Node)) {
-        setMenuPos(null)
-      }
-    }
-    document.addEventListener('mousedown', handleOutside)
-    return () => document.removeEventListener('mousedown', handleOutside)
-  }, [menuPos])
 
   function handleToggle(e: React.MouseEvent) {
     e.stopPropagation()
@@ -91,83 +82,81 @@ export function TaskActionMenu({ task, onDone, onOpenMove, onOpenQualify, onDele
         </svg>
       </button>
 
-      {/* Dropdown fixe */}
-      {menuPos && (
+      {/* Dropdown — rendu via portal dans document.body pour sortir de l'arbre dnd-kit */}
+      {menuPos && createPortal(
         <>
-          {/* Backdrop transparent pour fermer au clic extérieur */}
           <div
-            onClick={() => setMenuPos(null)}
-            style={{ position: 'fixed', inset: 0, zIndex: 299 }}
-          />
-          <div
+            ref={dropdownRef}
+            onPointerDown={(e) => e.stopPropagation()}
             style={{
-              position: 'fixed',
-              top: menuPos.top,
-              right: menuPos.right,
-              zIndex: 300,
-              background: '#161616',
-              border: '1px solid #2a2a2a',
-              borderRadius: '8px',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
-              overflow: 'hidden',
-              minWidth: '160px',
-            }}
+            position: 'fixed',
+            top: menuPos.top,
+            right: menuPos.right,
+            zIndex: 300,
+            background: '#161616',
+            border: '1px solid #2a2a2a',
+            borderRadius: '8px',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+            overflow: 'hidden',
+            minWidth: '160px',
+          }}
+        >
+          {/* Terminée */}
+          {!isDone && (
+            <button
+              type="button"
+              onClick={(e) => handleAction(e, () => onDone(task.id))}
+              style={{ ...ITEM_STYLE, color: '#4CAF7D' }}
+            >
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 8l4 4 8-8" />
+              </svg>
+              Terminée
+            </button>
+          )}
+
+          {/* Déplacer */}
+          <button
+            type="button"
+            onClick={(e) => handleAction(e, () => onOpenMove(task))}
+            style={{ ...ITEM_STYLE, color: '#ccc' }}
           >
-            {/* Terminée */}
-            {!isDone && (
-              <button
-                type="button"
-                onClick={(e) => handleAction(e, () => onDone(task.id))}
-                style={{ ...ITEM_STYLE, color: '#4CAF7D' }}
-              >
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M2 8l4 4 8-8" />
-                </svg>
-                Terminée
-              </button>
-            )}
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 8h6M8 5l3 3-3 3" />
+              <path d="M11 8H5M8 11l-3-3 3-3" opacity="0.4"/>
+            </svg>
+            Déplacer
+          </button>
 
-            {/* Déplacer */}
-            <button
-              type="button"
-              onClick={(e) => handleAction(e, () => onOpenMove(task))}
-              style={{ ...ITEM_STYLE, color: '#ccc' }}
-            >
-              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 8h6M8 5l3 3-3 3" />
-                <path d="M11 8H5M8 11l-3-3 3-3" opacity="0.4"/>
-              </svg>
-              Déplacer
-            </button>
+          {/* Qualifier */}
+          <button
+            type="button"
+            onClick={(e) => handleAction(e, () => onOpenQualify(task))}
+            style={{ ...ITEM_STYLE, color: '#ccc' }}
+          >
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M8 2l1.8 3.6 4 .6-2.9 2.8.7 4L8 11l-3.6 1.9.7-4L2.2 6.2l4-.6z" />
+            </svg>
+            Qualifier
+          </button>
 
-            {/* Qualifier */}
-            <button
-              type="button"
-              onClick={(e) => handleAction(e, () => onOpenQualify(task))}
-              style={{ ...ITEM_STYLE, color: '#ccc' }}
-            >
-              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M8 2l1.8 3.6 4 .6-2.9 2.8.7 4L8 11l-3.6 1.9.7-4L2.2 6.2l4-.6z" />
-              </svg>
-              Qualifier
-            </button>
+          {/* Séparateur */}
+          <div style={{ height: '1px', background: '#2a2a2a', margin: '2px 0' }} />
 
-            {/* Séparateur */}
-            <div style={{ height: '1px', background: '#2a2a2a', margin: '2px 0' }} />
-
-            {/* Supprimer */}
-            <button
-              type="button"
-              onClick={(e) => handleAction(e, () => onDelete(task.id))}
-              style={{ ...ITEM_STYLE, color: '#ef4444' }}
-            >
-              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 4h10M6 4V2h4v2M5 4l.5 9h5L11 4" />
-              </svg>
-              Supprimer
-            </button>
-          </div>
-        </>
+          {/* Supprimer */}
+          <button
+            type="button"
+            onClick={(e) => handleAction(e, () => onDelete(task.id))}
+            style={{ ...ITEM_STYLE, color: '#ef4444' }}
+          >
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 4h10M6 4V2h4v2M5 4l.5 9h5L11 4" />
+            </svg>
+            Supprimer
+          </button>
+        </div>
+        </>,
+        document.body,
       )}
     </>
   )

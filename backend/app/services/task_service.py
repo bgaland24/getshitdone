@@ -193,6 +193,15 @@ class TaskService:
         db.session.commit()
         return task
 
+    def reopen_task(self, task: Task) -> Task:
+        """Remet une tâche done en new (correction d'erreur)."""
+        if task.status != "done":
+            raise ValueError("Seule une tâche terminée peut être rouverte")
+        task.status = "new"
+        task.done_at = None
+        db.session.commit()
+        return task
+
     def cancel_task(self, task: Task) -> Task:
         """
         Annule une tâche (statut → cancelled).

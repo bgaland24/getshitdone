@@ -39,21 +39,23 @@ export function QualifyScreen() {
   async function handleQualify(payload: QualifyTaskPayload) {
     if (!currentTask) return
     setLoading(true)
+    // Capturer la longueur avant storeUpdate — qualifyTask retire la tâche de queue
+    const queueLength = queue.length
     try {
       const updated = await qualifyTask(currentTask.id, payload)
       storeUpdate(updated)
-      advance()
+      advance(queueLength)
     } finally {
       setLoading(false)
     }
   }
 
   function handleSkip() {
-    advance()
+    advance(queue.length)
   }
 
-  function advance() {
-    if (currentIndex + 1 >= total) {
+  function advance(queueLength: number) {
+    if (currentIndex + 1 >= queueLength) {
       setSessionDone(true)
     } else {
       setCurrentIndex((i) => i + 1)

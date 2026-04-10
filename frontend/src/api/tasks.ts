@@ -76,6 +76,12 @@ export async function doneTask(id: string): Promise<Task> {
   return data
 }
 
+/** Remet une tâche done en new (annule le statut done) */
+export async function undoneTask(id: string): Promise<Task> {
+  const { data } = await apiClient.post<Task>(`/tasks/${id}/undone`)
+  return data
+}
+
 /** Annule la tâche */
 export async function cancelTask(id: string): Promise<Task> {
   const { data } = await apiClient.post<Task>(`/tasks/${id}/cancel`)

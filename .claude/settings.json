@@ -1,7 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "Bash(find \"c:/Users/basti/Documents/repo/getshitdone/backend\" -type d -name \"__pycache__\" -exec rm -rf {} +)"
+      "Bash(find \"c:/Users/basti/Documents/repo/getshitdone/backend\" -type d -name \"__pycache__\" -exec rm -rf {} +)",
+      "Bash(npx playwright:*)",
+      "Read(//c/Users/basti/AppData/Local/ms-playwright//**)",
+      "Bash(wait)",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(bash test.sh)",
+      "Bash(node -e \"const s='Terminée'; console.log\\([...s].map\\(c => c.codePointAt\\(0\\).toString\\(16\\)\\).join\\(' '\\)\\)\")",
+      "Bash(bash test.sh --e2e-only)",
+      "Bash(bash /c/Users/basti/Documents/repo/getshitdone/test.sh --e2e-only)",
+      "Bash(netstat -ano)",
+      "Bash(tasklist /FI \"PID eq 31444\")",
+      "Read(//c/Users/basti/AppData/Local/Temp/claude/c--Users-basti-Documents-repo-getshitdone/aa5718d7-b781-4947-a7b4-dc0ed307ee04/tasks/**)"
     ]
   }
 }
