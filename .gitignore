@@ -22,7 +22,6 @@ backend/wsgi.py
 # Frontend — fichiers générés
 frontend/node_modules/
 frontend/dist/
-backend/static/
 
 # Tests
 frontend/test-results/
