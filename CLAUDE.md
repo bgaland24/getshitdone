@@ -43,3 +43,25 @@ Avant toute implémentation, poser un maximum de questions pour obtenir une visi
 
 - Les noms de variables, fonctions et classes se lisent comme de la prose
 - Le code doit être compréhensible sans documentation externe
+
+## 9. Checklist — modification du schéma BDD
+
+Tout ajout ou modification de colonne/table déclenche obligatoirement ces 4 actions :
+
+### 9.1 Migration dans `backend/app/migrations.py`
+- Ajouter un bloc `if not _column_exists(...)` ou `if not _table_exists(...)` dans `run_migrations()`
+- La migration doit être idempotente (vérification avant ALTER)
+- Tester que la migration s'applique sur une BDD existante sans données perdues
+
+### 9.2 Revue des tests backend (`backend/tests/`)
+- Vérifier que les fixtures créent bien les nouvelles colonnes si elles sont obligatoires
+- Mettre à jour les assertions qui vérifient la structure des objets retournés
+- Ajouter un test couvrant le nouveau champ si son comportement a des règles métier
+
+### 9.3 Revue de l'onboarding (`backend/app/services/onboarding_service.py`)
+- Vérifier que les données de démonstration sont cohérentes avec le nouveau schéma
+- Si la colonne a une valeur métier significative, l'inclure dans les tâches/catégories de démo
+
+### 9.4 Revue du seed E2E (`backend/seed.py`)
+- Vérifier que les données seedées pour Playwright incluent le nouveau champ si nécessaire
+- Les tests E2E qui vérifient des données précises peuvent casser si le schéma change
