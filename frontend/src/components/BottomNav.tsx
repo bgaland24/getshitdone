@@ -25,8 +25,8 @@ export function BottomNav() {
 
   const navItems: NavItem[] = [
     { route: ROUTES.CAPTURE,    label: 'Capture',    icon: '✦', badge: unorganizedCount || undefined },
-    { route: ROUTES.ORGANIZE,   label: 'Organiser',  icon: '≡' },
     { route: ROUTES.QUALIFY,    label: 'Qualifier',  icon: '◈', badge: unqualifiedCount || undefined },
+    { route: ROUTES.ORGANIZE,   label: 'Organiser',  icon: '≡' },
     { route: ROUTES.PRIORITIES, label: 'Priorités',  icon: '◎' },
   ]
 
@@ -46,7 +46,7 @@ export function BottomNav() {
           to={item.route}
           className="relative flex flex-col items-center gap-1 px-4 py-1 transition-colors"
           style={({ isActive }) => ({
-            color: isActive ? 'var(--color-accent)' : 'var(--color-text-muted)',
+            color: isActive ? 'var(--color-accent)' : '#ffffff',
           })}
         >
           {/* Icône avec badge optionnel */}

@@ -296,7 +296,7 @@ test.describe('Qualifier depuis le modal', () => {
     await expect(modal).toBeVisible({ timeout: 5_000 })
 
     await modal.getByRole('button', { name: 'Urgent', exact: true }).click()
-    await modal.getByRole('button', { name: /Important/i }).click()
+    await modal.getByRole('button', { name: 'Important', exact: true }).click()
     await modal.getByRole('button', { name: /1 sem/i }).click()
     await modal.getByRole('button', { name: /Mettre à jour/i }).click()
 
@@ -337,7 +337,7 @@ test.describe('Flux complet', () => {
 
     // 1. Capturer
     await page.goto('/capture')
-    await page.getByPlaceholder('Nouvelle tâche…').fill('Tâche flux complet E2E')
+    await page.getByPlaceholder('Nouvelle tâche (séparées par des ;)…').fill('Tâche flux complet E2E')
     await page.keyboard.press('Enter')
     await expect(page.getByText('Tâche flux complet E2E')).toBeVisible()
 
@@ -357,7 +357,7 @@ test.describe('Flux complet', () => {
     const dropdown2 = page.locator('[style*="position: fixed"][style*="z-index: 300"]').last()
     await dropdown2.getByText('Qualifier', { exact: true }).click()
     await page.getByRole('button', { name: /Non urgent/i }).first().click()
-    await page.getByRole('button', { name: /Important/i }).first().click()
+    await page.getByRole('button', { name: 'Important', exact: true }).first().click()
     await page.getByRole('button', { name: /1 mois/i }).click()
     await page.getByRole('button', { name: /Mettre à jour/i }).click()
 

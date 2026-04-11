@@ -78,7 +78,7 @@ export function DetailedCaptureForm({ categories, deliverables, onSubmit, loadin
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} style={{ paddingBottom: '120px' }}>
       {/* Titre */}
       <div style={{ marginBottom: '16px' }}>
         <div style={{ fontSize: '11px', color: '#ffffff', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '6px' }}>
@@ -170,7 +170,7 @@ export function DetailedCaptureForm({ categories, deliverables, onSubmit, loadin
                 style={{
                   flex: 1,
                   padding: '7px 6px', borderRadius: '6px',
-                  border: `1px solid ${isSelected ? color : '#ffffff'}`,
+                  border: `1px solid ${isSelected ? color : 'rgba(255,255,255,0.3)'}`,
                   background: isSelected ? color + '22' : 'transparent',
                   color: isSelected ? color : '#ffffff',
                   fontSize: '12px', cursor: 'pointer',
@@ -193,7 +193,7 @@ export function DetailedCaptureForm({ categories, deliverables, onSubmit, loadin
             style={{
               flex: 1,
               background: '#1a1a1a',
-              border: `1px solid ${horizonDate ? horizonColor + '60' : '#2a2a2a'}`,
+              border: `1px solid ${horizonDate ? horizonColor + '60' : 'rgba(255,255,255,0.3)'}`,
               borderRadius: '6px', padding: '7px 10px',
               color: horizonDate ? horizonColor : '#ffffff',
               fontSize: '13px', fontFamily: 'var(--font-mono)',

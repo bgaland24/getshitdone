@@ -52,7 +52,7 @@ export function RadioGroup({
                 flex: 1,
                 padding: '7px 6px',
                 borderRadius: '6px',
-                border: `1px solid ${isSelected ? activeColor : '#ffffff'}`,
+                border: `1px solid ${isSelected ? activeColor : 'rgba(255,255,255,0.3)'}`,
                 background: isSelected ? activeColor + '22' : 'transparent',
                 color: isSelected ? activeColor : '#ffffff',
                 fontSize: '12px',

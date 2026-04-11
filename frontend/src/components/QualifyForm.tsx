@@ -86,7 +86,7 @@ export function QualifyForm({
   const horizonColor = horizonDate ? getHorizonColor(horizonDate) : '#ffffff'
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} style={{ paddingBottom: '120px' }}>
       {/* Barre de progression (mode session) */}
       {progress && (
         <div style={{ marginBottom: '20px' }}>
@@ -207,7 +207,7 @@ export function QualifyForm({
                   flex: 1,
                   padding: '7px 6px',
                   borderRadius: '6px',
-                  border: `1px solid ${isSelected ? color : '#ffffff'}`,
+                  border: `1px solid ${isSelected ? color : 'rgba(255,255,255,0.3)'}`,
                   background: isSelected ? color + '22' : 'transparent',
                   color: isSelected ? color : '#ffffff',
                   fontSize: '12px',
@@ -233,7 +233,7 @@ export function QualifyForm({
             style={{
               flex: 1,
               background: '#1a1a1a',
-              border: `1px solid ${horizonDate ? horizonColor + '60' : '#2a2a2a'}`,
+              border: `1px solid ${horizonDate ? horizonColor + '60' : 'rgba(255,255,255,0.3)'}`,
               borderRadius: '6px',
               padding: '7px 10px',
               color: horizonDate ? horizonColor : '#ffffff',

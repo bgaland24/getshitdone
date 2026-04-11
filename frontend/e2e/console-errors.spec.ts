@@ -28,6 +28,9 @@ const APP_ROUTES = [
 const IGNORED_PATTERNS: RegExp[] = [
   /Download the React DevTools/i,
   /ResizeObserver loop/i,
+  // Erreurs réseau 401 : le navigateur les logue même quand le JS les catch.
+  // Ces erreurs sont gérées silencieusement côté application (ex: safeFetchPreferences).
+  /Failed to load resource: the server responded with a status of 401/i,
 ]
 
 /** Niveaux considérés comme bloquants */
