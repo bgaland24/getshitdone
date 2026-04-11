@@ -51,7 +51,7 @@ if [ "$RUN_BACKEND" = true ]; then
   echo ""
   echo "==> Tests backend (pytest)..."
   cd "$BACKEND"
-  python -m pytest tests/ -v --tb=short
+  python -m pytest tests/ --show-progress --tb=short
   echo "    Backend : OK"
 fi
 

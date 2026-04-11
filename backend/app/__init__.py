@@ -42,12 +42,14 @@ def create_app(config_name: str = None) -> Flask:
         from app.migrations import run_migrations
         run_migrations()
 
-    # Route catch-all : sert le frontend React pour toutes les routes non-API
+    # Route catch-all : sert les fichiers statiques ou index.html (SPA routing)
     @flask_app.route("/", defaults={"path": ""})
     @flask_app.route("/<path:path>")
     def serve_frontend(path):
-        """Sert index.html pour toutes les routes non-API (SPA routing)."""
+        """Sert le fichier statique demandé s'il existe, sinon index.html (SPA routing)."""
         static_dir = os.path.join(os.path.dirname(flask_app.root_path), "static")
+        if path and os.path.exists(os.path.join(static_dir, path)):
+            return send_from_directory(static_dir, path)
         index_path = os.path.join(static_dir, "index.html")
         if os.path.exists(index_path):
             return send_from_directory(static_dir, "index.html")

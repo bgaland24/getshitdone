@@ -3,8 +3,8 @@ Configuration pytest — fixtures partagées entre tous les tests.
 Utilise la base de données de test dédiée (intentionality_test.db).
 
 Stratégie d'isolation :
-- Chaque test vide toutes les tables après son exécution (DELETE rapide)
-- Les tests créent leurs propres données — pas de dépendance au seed
+- Les tables sont vidées AVANT chaque test (pas après)
+- Garantit un état propre même si le test précédent a planté
 - Le seed (seed.py) est réservé aux tests E2E Playwright
 """
 
@@ -14,6 +14,7 @@ import pytest
 # Force la BDD de test avant tout import de l'app
 os.environ["DATABASE_URL"] = "sqlite:///intentionality_test.db"
 os.environ["FLASK_ENV"] = "development"
+os.environ["ONBOARDING_DISABLED"] = "1"
 
 from app import create_app
 from app.database import db as _db
@@ -39,10 +40,13 @@ def client(app):
 
 @pytest.fixture(autouse=True)
 def clean_db(app):
-    """Vide toutes les tables après chaque test pour garantir l'isolation."""
+    """
+    Vide toutes les tables AVANT chaque test.
+    Garantit un état vierge même si le test précédent a planté
+    ou si la session a été interrompue.
+    """
     with app.app_context():
-        yield
-        _db.session.rollback()
         for table in reversed(_db.metadata.sorted_tables):
             _db.session.execute(table.delete())
         _db.session.commit()
+    yield
