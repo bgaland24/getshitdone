@@ -82,7 +82,13 @@ export function PrioritiesScreen() {
   const canPin = pinnedCountForDate < MAX_PINNED_PER_DATE
 
   useEffect(() => {
-    Promise.all([fetchTasks(), fetchCategories(), fetchDeliverables(), fetchSessions({ date: todayStr }), fetchPreferences()])
+    const DEFAULT_SORT_AXES: SortAxis[] = ['horizon', 'delegation', 'urgency', 'importance']
+    // fetchPreferences peut retourner 401 si le token n'est pas encore disponible
+    // au rechargement de page — on fallback sur les valeurs par défaut silencieusement.
+    const safeFetchPreferences = () =>
+      fetchPreferences().catch(() => ({ user_id: '', sort_axes: DEFAULT_SORT_AXES }))
+
+    Promise.all([fetchTasks(), fetchCategories(), fetchDeliverables(), fetchSessions({ date: todayStr }), safeFetchPreferences()])
       .then(([t, c, d, sessions, prefs]) => {
         setTasks(t)
         setCategories(c)
@@ -149,7 +155,7 @@ export function PrioritiesScreen() {
   return (
     <div style={{ padding: '16px 20px 0' }}>
       {/* Toggle Aujourd'hui / Demain */}
-      <div style={{ display: 'flex', borderRadius: '10px', overflow: 'hidden', border: '1px solid #2a2a2a', marginBottom: '20px' }}>
+      <div style={{ display: 'flex', borderRadius: '10px', overflow: 'hidden', border: '1px solid #ffffff', marginBottom: '20px' }}>
         {(['today', 'tomorrow'] as Mode[]).map((m) => (
           <button
             key={m}
@@ -160,7 +166,7 @@ export function PrioritiesScreen() {
               fontSize: '13px',
               fontWeight: 700,
               background: mode === m ? 'var(--color-accent)' : 'transparent',
-              color: mode === m ? '#000' : '#555',
+              color: mode === m ? '#000' : '#ffffff',
               border: 'none',
               cursor: 'pointer',
             }}
@@ -173,7 +179,7 @@ export function PrioritiesScreen() {
       {/* Section épinglées */}
       {pinnedTasks.length > 0 && (
         <section style={{ marginBottom: '20px' }}>
-          <div style={{ fontSize: '11px', color: '#555', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '10px' }}>
+          <div style={{ fontSize: '11px', color: '#ffffff', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '10px' }}>
             ÉPINGLÉES — {pinnedCountForDate}/{MAX_PINNED_PER_DATE}
           </div>
           {pinnedTasks.map((task) => (
@@ -198,13 +204,13 @@ export function PrioritiesScreen() {
 
       {/* Section liste triée */}
       <section>
-        <div style={{ fontSize: '11px', color: '#555', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{ fontSize: '11px', color: '#ffffff', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
           <span>À FAIRE</span>
           {!canPin && <span style={{ color: '#E86B3E', fontWeight: 400 }}>Max {MAX_PINNED_PER_DATE} épinglées</span>}
         </div>
 
         {qualifiedTasks.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '32px 0', color: '#333' }}>
+          <div style={{ textAlign: 'center', padding: '32px 0', color: '#ffffff' }}>
             <p style={{ fontSize: '13px' }}>Aucune tâche qualifiée disponible.</p>
           </div>
         ) : (
@@ -276,14 +282,14 @@ export function PrioritiesScreen() {
               width: '100%', maxWidth: '480px',
               background: '#111', borderRadius: '16px 16px 0 0',
               padding: '20px 20px 40px',
-              borderTop: '1px solid #2a2a2a',
+              borderTop: '1px solid #ffffff',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <span style={{ fontSize: '11px', color: '#555', fontWeight: 600, letterSpacing: '0.08em' }}>RE-QUALIFIER</span>
-              <button onClick={() => setRequalifyTask(null)} style={{ background: 'none', border: 'none', color: '#555', fontSize: '18px', cursor: 'pointer' }}>✕</button>
+              <span style={{ fontSize: '11px', color: '#ffffff', fontWeight: 600, letterSpacing: '0.08em' }}>RE-QUALIFIER</span>
+              <button onClick={() => setRequalifyTask(null)} style={{ background: 'none', border: 'none', color: '#ffffff', fontSize: '18px', cursor: 'pointer' }}>✕</button>
             </div>
-            <p style={{ margin: '0 0 16px', fontSize: '13px', color: '#888' }}>{requalifyTask.title}</p>
+            <p style={{ margin: '0 0 16px', fontSize: '13px', color: '#ffffff' }}>{requalifyTask.title}</p>
             <QualifyForm
               task={requalifyTask}
               categories={categories}
@@ -332,7 +338,7 @@ function PriorityTaskCard({
   onRequalify: (t: Task) => void
 }) {
   const isDone = task.status === 'done'
-  const catColor = category?.color ?? '#555'
+  const catColor = category?.color ?? '#ffffff'
   const [elapsed, setElapsed] = useState(0)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -357,7 +363,7 @@ function PriorityTaskCard({
     <div style={{
       background: isDone ? '#0d0d0d' : isActive ? '#141414' : '#0f0f0f',
       border: `1px solid ${isActive ? catColor + '60' : isPinned ? catColor + '33' : '#1e1e1e'}`,
-      borderLeft: `3px solid ${isDone ? '#222' : isPinned ? catColor : '#333'}`,
+      borderLeft: `3px solid ${isDone ? '#ffffff' : isPinned ? catColor : '#ffffff'}`,
       borderRadius: '8px',
       padding: '12px 14px',
       marginBottom: '8px',
@@ -373,7 +379,7 @@ function PriorityTaskCard({
           <p style={{
             margin: 0,
             fontSize: '14px',
-            color: isDone ? '#444' : '#d0d0d0',
+            color: isDone ? '#ffffff' : '#d0d0d0',
             fontWeight: 500,
             textDecoration: isDone ? 'line-through' : 'none',
           }}>
@@ -403,7 +409,7 @@ function PriorityTaskCard({
               onClick={() => onPause(task)}
               disabled={loading}
               title="Mettre en pause"
-              style={{ background: 'transparent', color: '#aaa', border: '1px solid #444', borderRadius: '5px', padding: '6px 20px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', minWidth: '90px' }}
+              style={{ background: 'transparent', color: '#ffffff', border: '1px solid #ffffff', borderRadius: '5px', padding: '6px 20px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', minWidth: '90px' }}
             >
               ⏸ Pause
             </button>
@@ -415,7 +421,7 @@ function PriorityTaskCard({
               onClick={() => onRequalify(task)}
               disabled={loading}
               title="Re-qualifier cette tâche"
-              style={{ background: 'transparent', color: '#666', border: '1px solid #2a2a2a', borderRadius: '5px', padding: '6px 8px', fontSize: '12px', cursor: 'pointer' }}
+              style={{ background: 'transparent', color: '#ffffff', border: '1px solid #ffffff', borderRadius: '5px', padding: '6px 8px', fontSize: '12px', cursor: 'pointer' }}
             >
               ✎
             </button>
@@ -436,7 +442,7 @@ function PriorityTaskCard({
               onClick={() => onUndone(task)}
               disabled={loading}
               title="Marquer comme non terminée"
-              style={{ background: 'transparent', color: '#555', border: '1px solid #2a2a2a', borderRadius: '5px', padding: '6px 10px', fontSize: '13px', cursor: 'pointer' }}
+              style={{ background: 'transparent', color: '#ffffff', border: '1px solid #ffffff', borderRadius: '5px', padding: '6px 10px', fontSize: '13px', cursor: 'pointer' }}
             >
               ↩
             </button>
@@ -458,7 +464,7 @@ function PriorityTaskCard({
               onClick={() => canPin && onPin(task)}
               disabled={loading || !canPin}
               title={canPin ? 'Épingler' : 'Maximum atteint'}
-              style={{ background: 'transparent', color: canPin ? '#888' : '#333', border: '1px solid #2a2a2a', borderRadius: '5px', padding: '6px 8px', fontSize: '13px', cursor: canPin ? 'pointer' : 'not-allowed' }}
+              style={{ background: 'transparent', color: canPin ? '#ffffff' : '#ffffff', border: '1px solid #ffffff', borderRadius: '5px', padding: '6px 8px', fontSize: '13px', cursor: canPin ? 'pointer' : 'not-allowed' }}
             >
               📌
             </button>

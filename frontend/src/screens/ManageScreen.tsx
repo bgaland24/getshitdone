@@ -108,7 +108,7 @@ export function ManageScreen() {
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '28px' }}>
         <button
           onClick={() => navigate(-1)}
-          style={{ background: 'none', border: 'none', color: '#555', fontSize: '20px', cursor: 'pointer', padding: 0 }}
+          style={{ background: 'none', border: 'none', color: '#ffffff', fontSize: '20px', cursor: 'pointer', padding: 0 }}
         >
           ←
         </button>
@@ -227,24 +227,24 @@ function CategoryCard({
             style={{
               width: '52px',
               background: '#1a1a1a',
-              border: '1px solid #2a2a2a',
+              border: '1px solid rgba(255,255,255,0.3)',
               borderRadius: '4px',
               padding: '3px 6px',
-              color: '#888',
+              color: '#ffffff',
               fontSize: '11px',
               fontFamily: 'var(--font-mono)',
               textAlign: 'right',
               outline: 'none',
             }}
           />
-          <span style={{ fontSize: '10px', color: '#444' }}>min/sem</span>
+          <span style={{ fontSize: '10px', color: '#ffffff' }}>min/sem</span>
         </div>
 
         {/* Supprimer catégorie */}
         <button
           onClick={() => onDeleteCategory(category.id)}
           disabled={loading}
-          style={{ background: 'transparent', border: 'none', color: '#444', fontSize: '16px', cursor: 'pointer', padding: '0 4px' }}
+          style={{ background: 'transparent', border: 'none', color: '#ffffff', fontSize: '16px', cursor: 'pointer', padding: '0 4px' }}
           title="Supprimer la catégorie"
         >
           ✕
@@ -254,7 +254,7 @@ function CategoryCard({
       {/* Liste des livrables */}
       <div style={{ padding: '8px 16px' }}>
         {deliverables.length === 0 && !addingDel && (
-          <p style={{ fontSize: '12px', color: '#333', margin: '6px 0' }}>Aucun livrable</p>
+          <p style={{ fontSize: '12px', color: '#ffffff', margin: '6px 0' }}>Aucun livrable</p>
         )}
 
         {deliverables.map((del) => (
@@ -284,7 +284,7 @@ function CategoryCard({
                 if (e.key === 'Escape') { setAddingDel(false); setNewDelName('') }
               }}
               placeholder="Nom du livrable…"
-              style={{ flex: 1, background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '5px', padding: '6px 10px', color: '#f0f0f0', fontSize: '13px', outline: 'none' }}
+              style={{ flex: 1, background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '5px', padding: '6px 10px', color: '#f0f0f0', fontSize: '13px', outline: 'none' }}
             />
             <button
               onClick={() => {
@@ -299,7 +299,7 @@ function CategoryCard({
             </button>
             <button
               onClick={() => { setAddingDel(false); setNewDelName('') }}
-              style={{ background: 'transparent', border: 'none', color: '#444', fontSize: '16px', cursor: 'pointer' }}
+              style={{ background: 'transparent', border: 'none', color: '#ffffff', fontSize: '16px', cursor: 'pointer' }}
             >
               ✕
             </button>
@@ -307,7 +307,7 @@ function CategoryCard({
         ) : (
           <button
             onClick={() => setAddingDel(true)}
-            style={{ background: 'transparent', border: 'none', color: '#444', fontSize: '12px', cursor: 'pointer', padding: '6px 0', display: 'flex', alignItems: 'center', gap: '4px' }}
+            style={{ background: 'transparent', border: 'none', color: '#ffffff', fontSize: '12px', cursor: 'pointer', padding: '6px 0', display: 'flex', alignItems: 'center', gap: '4px' }}
           >
             <span style={{ fontSize: '14px' }}>+</span> Ajouter un livrable
           </button>
@@ -338,7 +338,7 @@ function DeliverableRow({ deliverable, allCategories, loading, onRename, onMove,
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '7px 0', borderBottom: '1px solid #111' }}>
-      <span style={{ fontSize: '11px', color: '#333', flexShrink: 0 }}>└</span>
+      <span style={{ fontSize: '11px', color: '#ffffff', flexShrink: 0 }}>└</span>
 
       {/* Nom */}
       {editing ? (
@@ -353,7 +353,7 @@ function DeliverableRow({ deliverable, allCategories, loading, onRename, onMove,
       ) : (
         <span
           onClick={() => setEditing(true)}
-          style={{ flex: 1, fontSize: '13px', color: '#999', cursor: 'text' }}
+          style={{ flex: 1, fontSize: '13px', color: '#ffffff', cursor: 'text' }}
         >
           {deliverable.name}
         </span>
@@ -367,10 +367,10 @@ function DeliverableRow({ deliverable, allCategories, loading, onRename, onMove,
         title="Déplacer vers…"
         style={{
           background: '#1a1a1a',
-          border: '1px solid #2a2a2a',
+          border: '1px solid rgba(255,255,255,0.3)',
           borderRadius: '4px',
           padding: '2px 6px',
-          color: '#555',
+          color: '#ffffff',
           fontSize: '10px',
           cursor: 'pointer',
           appearance: 'none',
@@ -388,7 +388,7 @@ function DeliverableRow({ deliverable, allCategories, loading, onRename, onMove,
       <button
         onClick={() => onDelete(deliverable.id)}
         disabled={loading}
-        style={{ background: 'transparent', border: 'none', color: '#333', fontSize: '14px', cursor: 'pointer', padding: 0 }}
+        style={{ background: 'transparent', border: 'none', color: '#ffffff', fontSize: '14px', cursor: 'pointer', padding: 0 }}
         title="Supprimer le livrable"
       >
         ✕
@@ -411,7 +411,7 @@ function ColorPicker({ value, onChange }: { value: string; onChange: (c: string)
           height: '20px',
           borderRadius: '50%',
           background: value,
-          border: '2px solid #2a2a2a',
+          border: '2px solid rgba(255,255,255,0.3)',
           cursor: 'pointer',
           flexShrink: 0,
         }}
@@ -423,7 +423,7 @@ function ColorPicker({ value, onChange }: { value: string; onChange: (c: string)
           left: 0,
           zIndex: 100,
           background: '#1a1a1a',
-          border: '1px solid #2a2a2a',
+          border: '1px solid rgba(255,255,255,0.3)',
           borderRadius: '8px',
           padding: '8px',
           display: 'grid',
@@ -477,9 +477,9 @@ function CreateCategoryForm({ loading, onCreate }: {
           width: '100%',
           padding: '12px',
           background: 'transparent',
-          border: '1px dashed #2a2a2a',
+          border: '1px dashed rgba(255,255,255,0.3)',
           borderRadius: '10px',
-          color: '#444',
+          color: '#ffffff',
           fontSize: '13px',
           cursor: 'pointer',
           marginBottom: '16px',
@@ -495,7 +495,7 @@ function CreateCategoryForm({ loading, onCreate }: {
       onSubmit={handleSubmit}
       style={{
         background: '#0f0f0f',
-        border: '1px solid #2a2a2a',
+        border: '1px solid rgba(255,255,255,0.3)',
         borderRadius: '12px',
         padding: '16px',
         display: 'flex',
@@ -504,7 +504,7 @@ function CreateCategoryForm({ loading, onCreate }: {
         marginBottom: '16px',
       }}
     >
-      <p style={{ fontSize: '11px', color: '#555', letterSpacing: '0.08em', fontWeight: 600 }}>
+      <p style={{ fontSize: '11px', color: '#ffffff', letterSpacing: '0.08em', fontWeight: 600 }}>
         NOUVELLE CATÉGORIE
       </p>
 
@@ -515,18 +515,18 @@ function CreateCategoryForm({ loading, onCreate }: {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Nom de la catégorie…"
-          style={{ flex: 1, background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '6px', padding: '8px 12px', color: '#f0f0f0', fontSize: '14px', outline: 'none' }}
+          style={{ flex: 1, background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '6px', padding: '8px 12px', color: '#f0f0f0', fontSize: '14px', outline: 'none' }}
         />
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <label style={{ fontSize: '11px', color: '#555' }}>Objectif hebdo (min)</label>
+        <label style={{ fontSize: '11px', color: '#ffffff' }}>Objectif hebdo (min)</label>
         <input
           type="number"
           value={target}
           min={0}
           onChange={(e) => setTarget(e.target.value)}
-          style={{ width: '70px', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '5px', padding: '5px 8px', color: '#888', fontSize: '12px', fontFamily: 'var(--font-mono)', outline: 'none', textAlign: 'right' }}
+          style={{ width: '70px', background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '5px', padding: '5px 8px', color: '#888', fontSize: '12px', fontFamily: 'var(--font-mono)', outline: 'none', textAlign: 'right' }}
         />
       </div>
 
@@ -534,14 +534,14 @@ function CreateCategoryForm({ loading, onCreate }: {
         <button
           type="button"
           onClick={() => setOpen(false)}
-          style={{ flex: 1, padding: '10px', background: 'transparent', border: '1px solid #2a2a2a', borderRadius: '7px', color: '#555', fontSize: '13px', cursor: 'pointer' }}
+          style={{ flex: 1, padding: '10px', background: 'transparent', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '7px', color: '#ffffff', fontSize: '13px', cursor: 'pointer' }}
         >
           Annuler
         </button>
         <button
           type="submit"
           disabled={!name.trim() || loading}
-          style={{ flex: 2, padding: '10px', background: name.trim() ? 'var(--color-accent)' : '#1a1a1a', color: name.trim() ? '#000' : '#333', border: 'none', borderRadius: '7px', fontSize: '13px', fontWeight: 700, cursor: name.trim() ? 'pointer' : 'not-allowed' }}
+          style={{ flex: 2, padding: '10px', background: name.trim() ? 'var(--color-accent)' : '#1a1a1a', color: name.trim() ? '#000' : '#ffffff', border: 'none', borderRadius: '7px', fontSize: '13px', fontWeight: 700, cursor: name.trim() ? 'pointer' : 'not-allowed' }}
         >
           Créer
         </button>

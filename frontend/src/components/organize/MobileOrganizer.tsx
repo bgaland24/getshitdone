@@ -69,7 +69,7 @@ export function MobileOrganizer({
             <span style={{ fontSize: '11px', fontWeight: 700, color: '#E8A23E', letterSpacing: '0.06em' }}>
               NON ORGANISÉES
             </span>
-            <span style={{ fontSize: '10px', color: '#333', fontFamily: 'var(--font-mono)' }}>
+            <span style={{ fontSize: '10px', color: '#ffffff', fontFamily: 'var(--font-mono)' }}>
               {unorganized.length}
             </span>
           </div>
@@ -113,10 +113,10 @@ export function MobileOrganizer({
               <span style={{ fontSize: '11px', fontWeight: 700, color: cat.color, letterSpacing: '0.06em', flex: 1 }}>
                 {cat.name.toUpperCase()}
               </span>
-              <span style={{ fontSize: '10px', color: '#333', fontFamily: 'var(--font-mono)' }}>
+              <span style={{ fontSize: '10px', color: '#ffffff', fontFamily: 'var(--font-mono)' }}>
                 {totalTasks}
               </span>
-              <span style={{ fontSize: '10px', color: '#333', marginLeft: '4px' }}>
+              <span style={{ fontSize: '10px', color: '#ffffff', marginLeft: '4px' }}>
                 {isCollapsed ? '›' : '⌄'}
               </span>
             </button>
@@ -127,7 +127,7 @@ export function MobileOrganizer({
                   style={{
                     padding: '6px 20px 6px 32px',
                     fontSize: '10px',
-                    color: '#444',
+                    color: '#ffffff',
                     letterSpacing: '0.06em',
                     fontWeight: 600,
                     borderBottom: '1px solid #111',
@@ -193,7 +193,7 @@ function MobileTaskRow({
           style={{
             margin: '0 0 4px',
             fontSize: '13px',
-            color: task.status === 'done' ? '#444' : '#ccc',
+            color: task.status === 'done' ? '#ffffff' : '#ffffff',
             lineHeight: 1.35,
             textDecoration: task.status === 'done' ? 'line-through' : 'none',
             fontStyle: task.delegation === 'delegated' ? 'italic' : 'normal',

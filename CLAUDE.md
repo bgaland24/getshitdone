@@ -6,6 +6,10 @@ Avant toute implémentation, poser un maximum de questions pour obtenir une visi
 - Aller au-delà du besoin immédiat : anticiper les V2/V3 pour éviter de devoir tout refactorer
 - Ne jamais commencer à coder sans avoir validé l'architecture avec l'utilisateur
 
+## 1.bis Prise de recul
+
+Avant toute implémentation, détermine si ce que tu fais n'est pas trop proche de ce que tu as fait dans tes 3 dernières implémentation de la session. Si c'est le cas demande toi si tu ne tourne pas en rond et requestionne moi si besoin. 
+
 ## 2. Architecture modulaire
 
 - Un fichier = une responsabilité unique

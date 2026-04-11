@@ -291,10 +291,14 @@ test.describe('Qualifier depuis le modal', () => {
     const dropdown = page.locator('[style*="position: fixed"][style*="z-index: 300"]').last()
     await dropdown.getByText('Qualifier', { exact: true }).click()
 
-    await page.getByRole('button', { name: /Urgent/i }).first().click()
-    await page.getByRole('button', { name: /Important/i }).first().click()
-    await page.getByRole('button', { name: /1 sem/i }).click()
-    await page.getByRole('button', { name: /Mettre à jour/i }).click()
+    // Attendre que le modal soit affiché avant d'interagir avec les boutons
+    const modal = page.locator('[style*="position: fixed"][style*="border-radius: 12px"]')
+    await expect(modal).toBeVisible({ timeout: 5_000 })
+
+    await modal.getByRole('button', { name: 'Urgent', exact: true }).click()
+    await modal.getByRole('button', { name: /Important/i }).click()
+    await modal.getByRole('button', { name: /1 sem/i }).click()
+    await modal.getByRole('button', { name: /Mettre à jour/i }).click()
 
     await expect(page.getByText('QUALIFIER', { exact: true })).not.toBeVisible({ timeout: 5_000 })
     await expect(page.getByText('Non qualifiée')).toBeVisible()
@@ -309,7 +313,11 @@ test.describe('Qualifier depuis le modal', () => {
     await page.locator('[title="Actions"]').first().click()
     const dropdown = page.locator('[style*="position: fixed"][style*="z-index: 300"]').last()
     await dropdown.getByText('Qualifier', { exact: true }).click()
-    await page.getByRole('button', { name: /Urgent/i }).first().click()
+
+    // Attendre que le modal soit visible avant d'interagir (un <select> peut intercepter les clics sinon)
+    const modal = page.locator('[style*="position: fixed"][style*="border-radius: 12px"]')
+    await expect(modal).toBeVisible({ timeout: 5_000 })
+    await modal.getByRole('button', { name: 'Urgent', exact: true }).click()
 
     // Fermer via le bouton ×
     await page.locator('button').filter({ hasText: '×' }).click()

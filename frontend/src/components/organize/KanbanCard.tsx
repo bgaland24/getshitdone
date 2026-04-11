@@ -39,7 +39,7 @@ export function KanbanCard({
   })
 
   const cat = categories.find((c) => c.id === task.category_id)
-  const borderColor = cat?.color ?? '#333'
+  const borderColor = cat?.color ?? '#ffffff'
 
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -68,7 +68,7 @@ export function KanbanCard({
           <p
             style={{
               fontSize: '13px',
-              color: task.status === 'done' ? '#444' : '#ccc',
+              color: task.status === 'done' ? '#ffffff' : '#ffffff',
               margin: '0 0 6px',
               lineHeight: 1.35,
               overflow: 'hidden',

@@ -70,7 +70,7 @@ export function TaskActionMenu({ task, onDone, onOpenMove, onOpenQualify, onDele
           borderRadius: '4px',
           padding: '3px 6px',
           cursor: 'pointer',
-          color: '#555',
+          color: '#ffffff',
           lineHeight: 1,
           flexShrink: 0,
         }}
@@ -94,7 +94,7 @@ export function TaskActionMenu({ task, onDone, onOpenMove, onOpenQualify, onDele
             right: menuPos.right,
             zIndex: 300,
             background: '#161616',
-            border: '1px solid #2a2a2a',
+            border: '1px solid #ffffff',
             borderRadius: '8px',
             boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
             overflow: 'hidden',
@@ -119,7 +119,7 @@ export function TaskActionMenu({ task, onDone, onOpenMove, onOpenQualify, onDele
           <button
             type="button"
             onClick={(e) => handleAction(e, () => onOpenMove(task))}
-            style={{ ...ITEM_STYLE, color: '#ccc' }}
+            style={{ ...ITEM_STYLE, color: '#ffffff' }}
           >
             <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M5 8h6M8 5l3 3-3 3" />
@@ -132,7 +132,7 @@ export function TaskActionMenu({ task, onDone, onOpenMove, onOpenQualify, onDele
           <button
             type="button"
             onClick={(e) => handleAction(e, () => onOpenQualify(task))}
-            style={{ ...ITEM_STYLE, color: '#ccc' }}
+            style={{ ...ITEM_STYLE, color: '#ffffff' }}
           >
             <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M8 2l1.8 3.6 4 .6-2.9 2.8.7 4L8 11l-3.6 1.9.7-4L2.2 6.2l4-.6z" />
@@ -141,7 +141,7 @@ export function TaskActionMenu({ task, onDone, onOpenMove, onOpenQualify, onDele
           </button>
 
           {/* Séparateur */}
-          <div style={{ height: '1px', background: '#2a2a2a', margin: '2px 0' }} />
+          <div style={{ height: '1px', background: 'rgba(255,255,255,0.15)', margin: '2px 0' }} />
 
           {/* Supprimer */}
           <button

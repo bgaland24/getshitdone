@@ -18,7 +18,7 @@ import { RadioGroup } from './RadioGroup'
 const SELECT_STYLE: React.CSSProperties = {
   width: '100%',
   background: '#1a1a1a',
-  border: '1px solid #2a2a2a',
+  border: '1px solid rgba(255,255,255,0.3)',
   borderRadius: '6px',
   padding: '8px 10px',
   fontSize: '13px',
@@ -47,7 +47,7 @@ export function DetailedCaptureForm({ categories, deliverables, onSubmit, loadin
 
   const filteredDeliverables = deliverables.filter((d) => d.category_id === categoryId)
   const isValid = title.trim() !== '' && urgency !== null && importance !== null && horizonDate !== ''
-  const horizonColor = horizonDate ? getHorizonColor(horizonDate) : '#555'
+  const horizonColor = horizonDate ? getHorizonColor(horizonDate) : '#ffffff'
 
   useEffect(() => { inputRef.current?.focus() }, [])
 
@@ -81,7 +81,7 @@ export function DetailedCaptureForm({ categories, deliverables, onSubmit, loadin
     <form onSubmit={handleSubmit}>
       {/* Titre */}
       <div style={{ marginBottom: '16px' }}>
-        <div style={{ fontSize: '11px', color: '#555', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '6px' }}>
+        <div style={{ fontSize: '11px', color: '#ffffff', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '6px' }}>
           TÂCHE <span style={{ color: '#E86B3E' }}>*</span>
         </div>
         <input
@@ -93,7 +93,7 @@ export function DetailedCaptureForm({ categories, deliverables, onSubmit, loadin
           style={{
             width: '100%',
             background: '#1a1a1a',
-            border: '1px solid #2a2a2a',
+            border: '1px solid rgba(255,255,255,0.3)',
             borderRadius: '6px',
             padding: '10px 12px',
             color: '#f0f0f0',
@@ -108,16 +108,16 @@ export function DetailedCaptureForm({ categories, deliverables, onSubmit, loadin
       {/* Catégorie + livrable */}
       <div style={{ marginBottom: '16px', display: 'flex', gap: '10px' }}>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: '11px', color: '#555', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '6px' }}>CATÉGORIE</div>
-          <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} style={{ ...SELECT_STYLE, color: categoryId ? '#f0f0f0' : '#555' }}>
+          <div style={{ fontSize: '11px', color: '#ffffff', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '6px' }}>CATÉGORIE</div>
+          <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} style={{ ...SELECT_STYLE, color: categoryId ? '#f0f0f0' : '#ffffff' }}>
             <option value="">Sans catégorie</option>
             {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         </div>
         {categoryId && (
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '11px', color: '#555', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '6px' }}>LIVRABLE</div>
-            <select value={deliverableId} onChange={(e) => setDeliverableId(e.target.value)} style={{ ...SELECT_STYLE, color: deliverableId ? '#f0f0f0' : '#555' }}>
+            <div style={{ fontSize: '11px', color: '#ffffff', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '6px' }}>LIVRABLE</div>
+            <select value={deliverableId} onChange={(e) => setDeliverableId(e.target.value)} style={{ ...SELECT_STYLE, color: deliverableId ? '#f0f0f0' : '#ffffff' }}>
               <option value="">Sans livrable</option>
               {filteredDeliverables.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
             </select>
@@ -151,7 +151,7 @@ export function DetailedCaptureForm({ categories, deliverables, onSubmit, loadin
 
       {/* Horizon + Durée */}
       <div style={{ marginBottom: '16px' }}>
-        <div style={{ fontSize: '11px', color: '#555', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <div style={{ fontSize: '11px', color: '#ffffff', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
           HORIZON <span style={{ color: '#E86B3E' }}>*</span>
           {horizonDate && (
             <span style={{ color: horizonColor, fontFamily: 'var(--font-mono)', fontSize: '10px', marginLeft: '6px' }}>
@@ -170,9 +170,9 @@ export function DetailedCaptureForm({ categories, deliverables, onSubmit, loadin
                 style={{
                   flex: 1,
                   padding: '7px 6px', borderRadius: '6px',
-                  border: `1px solid ${isSelected ? color : '#2a2a2a'}`,
+                  border: `1px solid ${isSelected ? color : '#ffffff'}`,
                   background: isSelected ? color + '22' : 'transparent',
-                  color: isSelected ? color : '#555',
+                  color: isSelected ? color : '#ffffff',
                   fontSize: '12px', cursor: 'pointer',
                   fontWeight: isSelected ? 600 : 400, transition: 'all 0.15s',
                   textAlign: 'center', whiteSpace: 'nowrap',
@@ -195,7 +195,7 @@ export function DetailedCaptureForm({ categories, deliverables, onSubmit, loadin
               background: '#1a1a1a',
               border: `1px solid ${horizonDate ? horizonColor + '60' : '#2a2a2a'}`,
               borderRadius: '6px', padding: '7px 10px',
-              color: horizonDate ? horizonColor : '#555',
+              color: horizonDate ? horizonColor : '#ffffff',
               fontSize: '13px', fontFamily: 'var(--font-mono)',
               outline: 'none', minWidth: 0, boxSizing: 'border-box',
               colorScheme: 'dark',
@@ -208,9 +208,9 @@ export function DetailedCaptureForm({ categories, deliverables, onSubmit, loadin
             placeholder="DURÉE"
             style={{
               flex: 1,
-              background: '#1a1a1a', border: '1px solid #2a2a2a',
+              background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.3)',
               borderRadius: '6px', padding: '7px 6px',
-              color: estimatedMinutes ? '#f0f0f0' : '#555',
+              color: estimatedMinutes ? '#f0f0f0' : '#ffffff',
               fontSize: '12px', fontFamily: 'var(--font-mono)',
               outline: 'none', minWidth: 0, textAlign: 'center',
             }}
@@ -236,7 +236,7 @@ export function DetailedCaptureForm({ categories, deliverables, onSubmit, loadin
           style={{
             width: '100%',
             background: isValid ? 'var(--color-accent)' : '#1a1a1a',
-            color: isValid ? '#000' : '#333',
+            color: isValid ? '#000' : '#ffffff',
             border: 'none', borderRadius: '8px', padding: '14px',
             fontSize: '14px', fontWeight: 700,
             cursor: isValid && !loading ? 'pointer' : 'not-allowed',

@@ -16,13 +16,14 @@ export function ScoreScreen() {
   useEffect(() => {
     Promise.all([fetchTodayScore(), fetchWeeklyScore(), fetchScoreHistory(4)])
       .then(([today, weekly, hist]) => { setTodayScore(today); setWeeklyScore(weekly); setHistory(hist) })
+      .catch(() => { /* score indisponible — affichage dégradé */ })
       .finally(() => setLoading(false))
   }, [])
 
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
-        <p style={{ color: '#333', fontSize: '13px' }}>Chargement…</p>
+        <p style={{ color: '#ffffff', fontSize: '13px' }}>Chargement…</p>
       </div>
     )
   }
@@ -35,12 +36,12 @@ export function ScoreScreen() {
 
       {/* Anneau */}
       <div style={{ textAlign: 'center', marginBottom: '32px', position: 'relative', display: 'inline-block', left: '50%', transform: 'translateX(-50%)' }}>
-        <ScoreRing score={todayScore?.global_score ?? 0} size={160} strokeWidth={14} />
+        <ScoreRing score={todayScore?.global ?? 0} size={160} strokeWidth={14} />
         <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', textAlign: 'center' }}>
           <div style={{ fontSize: '38px', fontWeight: 800, color: 'var(--color-accent)', fontFamily: 'var(--font-mono)', lineHeight: 1 }}>
-            {Math.round(todayScore?.global_score ?? 0)}
+            {Math.round(todayScore?.global ?? 0)}
           </div>
-          <div style={{ fontSize: '10px', color: '#555', letterSpacing: '0.06em', marginTop: '4px' }}>
+          <div style={{ fontSize: '10px', color: '#ffffff', letterSpacing: '0.06em', marginTop: '4px' }}>
             INTENTIONNALITÉ
           </div>
         </div>
@@ -57,9 +58,9 @@ export function ScoreScreen() {
             marginBottom: '16px',
           }}
         >
-          <SubBar label="Respect des priorités"     value={todayScore.intentionality_score} color="#4CAF7D" desc="Tâches prioritaires complétées vs planifiées" />
-          <SubBar label="Allocations temporelles"   value={todayScore.efficiency_score}     color="#7B8FE8" desc="Temps réel par catégorie vs objectifs hebdo" />
-          <SubBar label="Qualité de clôture"        value={todayScore.engagement_score}     color="#E8C93E" desc="Tâches terminées dans les 5 min après session" />
+          <SubBar label="Respect des priorités"     value={todayScore.priorities}  color="#4CAF7D" desc="Tâches prioritaires complétées vs planifiées" />
+          <SubBar label="Allocations temporelles"   value={todayScore.allocations} color="#7B8FE8" desc="Temps réel par catégorie vs objectifs hebdo" />
+          <SubBar label="Qualité de clôture"        value={todayScore.closure}     color="#E8C93E" desc="Tâches terminées dans les 5 min après session" />
         </div>
       )}
 
@@ -74,7 +75,7 @@ export function ScoreScreen() {
             marginBottom: '16px',
           }}
         >
-          <p style={{ fontSize: '11px', color: '#444', letterSpacing: '0.08em', marginBottom: '16px', fontWeight: 600 }}>
+          <p style={{ fontSize: '11px', color: '#ffffff', letterSpacing: '0.08em', marginBottom: '16px', fontWeight: 600 }}>
             ÉVOLUTION 4 SEMAINES
           </p>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', height: '60px' }}>
@@ -82,17 +83,17 @@ export function ScoreScreen() {
               const isLast = i === history.length - 1
               return (
                 <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-                  <span style={{ fontSize: '10px', color: isLast ? 'var(--color-accent)' : '#444', fontFamily: 'var(--font-mono)' }}>
-                    {Math.round(entry.score)}
+                  <span style={{ fontSize: '10px', color: isLast ? 'var(--color-accent)' : '#ffffff', fontFamily: 'var(--font-mono)' }}>
+                    {Math.round(entry.global)}
                   </span>
                   <div style={{
                     width: '100%',
                     background: isLast ? 'var(--color-accent)' : '#2a2a2a',
                     borderRadius: '3px 3px 0 0',
-                    height: `${(entry.score / 100) * 48}px`,
+                    height: `${(entry.global / 100) * 48}px`,
                     minHeight: '4px',
                   }} />
-                  <span style={{ fontSize: '9px', color: '#333' }}>
+                  <span style={{ fontSize: '9px', color: '#ffffff' }}>
                     S-{history.length - 1 - i}
                   </span>
                 </div>
@@ -103,41 +104,46 @@ export function ScoreScreen() {
       )}
 
       {/* Détail catégories */}
-      {weeklyScore && weeklyScore.category_breakdown.length > 0 && (
+      {weeklyScore && weeklyScore.categories.length > 0 && (
         <div style={{ marginBottom: '16px' }}>
-          <p style={{ fontSize: '11px', color: '#444', letterSpacing: '0.08em', marginBottom: '12px', fontWeight: 600 }}>
+          <p style={{ fontSize: '11px', color: '#ffffff', letterSpacing: '0.08em', marginBottom: '12px', fontWeight: 600 }}>
             PAR CATÉGORIE — CETTE SEMAINE
           </p>
-          {weeklyScore.category_breakdown.map((cat) => (
-            <div
-              key={cat.category_id}
-              style={{
-                background: '#0f0f0f',
-                border: '1px solid #1e1e1e',
-                borderRadius: '8px',
-                padding: '12px 16px',
-                marginBottom: '8px',
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: cat.color, display: 'inline-block' }} />
-                  <span style={{ fontSize: '13px', color: '#ccc' }}>{cat.category_name}</span>
+          {weeklyScore.categories.map((cat) => {
+            const completionRate = cat.target_minutes > 0
+              ? Math.min(cat.actual_minutes / cat.target_minutes, 1)
+              : 0
+            return (
+              <div
+                key={cat.category_id}
+                style={{
+                  background: '#0f0f0f',
+                  border: '1px solid #1e1e1e',
+                  borderRadius: '8px',
+                  padding: '12px 16px',
+                  marginBottom: '8px',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: cat.category_color, display: 'inline-block' }} />
+                    <span style={{ fontSize: '13px', color: '#ccc' }}>{cat.category_name}</span>
+                  </div>
+                  <span style={{ fontSize: '12px', color: '#ffffff', fontFamily: 'var(--font-mono)' }}>
+                    {cat.actual_minutes}m / {cat.target_minutes}m
+                  </span>
                 </div>
-                <span style={{ fontSize: '12px', color: '#555', fontFamily: 'var(--font-mono)' }}>
-                  {cat.time_spent_minutes}m / {cat.weekly_target_minutes}m
-                </span>
+                <div style={{ height: '4px', background: '#1a1a1a', borderRadius: '2px' }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${completionRate * 100}%`,
+                    background: cat.category_color,
+                    borderRadius: '2px',
+                  }} />
+                </div>
               </div>
-              <div style={{ height: '4px', background: '#1a1a1a', borderRadius: '2px' }}>
-                <div style={{
-                  height: '100%',
-                  width: `${Math.min(cat.completion_rate * 100, 100)}%`,
-                  background: cat.color,
-                  borderRadius: '2px',
-                }} />
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>
@@ -150,7 +156,7 @@ function SubBar({ label, value, color, desc }: { label: string; value: number; c
   return (
     <div style={{ marginBottom: '20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-        <span style={{ fontSize: '13px', color: '#aaa' }}>{label}</span>
+        <span style={{ fontSize: '13px', color: '#ffffff' }}>{label}</span>
         <span style={{ fontSize: '16px', fontWeight: 700, color, fontFamily: 'var(--font-mono)' }}>
           {Math.round(value)}%
         </span>
@@ -158,7 +164,7 @@ function SubBar({ label, value, color, desc }: { label: string; value: number; c
       <div style={{ height: '4px', background: '#1a1a1a', borderRadius: '2px' }}>
         <div style={{ height: '100%', width: `${value}%`, background: color, borderRadius: '2px' }} />
       </div>
-      <p style={{ fontSize: '11px', color: '#555', marginTop: '4px', fontStyle: 'italic' }}>{desc}</p>
+      <p style={{ fontSize: '11px', color: '#ffffff', marginTop: '4px', fontStyle: 'italic' }}>{desc}</p>
     </div>
   )
 }

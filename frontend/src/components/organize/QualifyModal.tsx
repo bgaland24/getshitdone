@@ -52,7 +52,7 @@ export function QualifyModal({ task, categories, deliverables, onSubmit, onClose
           zIndex: 300,
           background: 'var(--color-bg-app)',
           borderRadius: '12px 12px 0 0',
-          borderTop: '1px solid #2a2a2a',
+          borderTop: '1px solid #ffffff',
           maxHeight: '92vh',
           overflowY: 'auto',
           padding: '20px 20px 0',
@@ -70,7 +70,7 @@ export function QualifyModal({ task, categories, deliverables, onSubmit, onClose
           <span
             style={{
               fontSize: '11px',
-              color: '#555',
+              color: '#ffffff',
               letterSpacing: '0.08em',
               fontWeight: 600,
             }}
@@ -82,7 +82,7 @@ export function QualifyModal({ task, categories, deliverables, onSubmit, onClose
             style={{
               background: 'none',
               border: 'none',
-              color: '#555',
+              color: '#ffffff',
               fontSize: '20px',
               cursor: 'pointer',
               padding: '0 4px',

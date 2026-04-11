@@ -58,7 +58,7 @@ export function LoginScreen() {
         <div style={{ fontSize: '28px', fontWeight: 800, letterSpacing: '-0.03em', color: '#f0f0f0', marginBottom: '8px' }}>
           intent<span style={{ color: 'var(--color-accent)' }}>.</span>
         </div>
-        <p style={{ fontSize: '13px', color: '#444' }}>
+        <p style={{ fontSize: '13px', color: '#ffffff' }}>
           Rends l'intentionnalité plus facile que la réactivité.
         </p>
       </div>
@@ -71,7 +71,7 @@ export function LoginScreen() {
           display: 'flex',
           borderRadius: '10px',
           overflow: 'hidden',
-          border: '1px solid #2a2a2a',
+          border: '1px solid rgba(255,255,255,0.3)',
           marginBottom: '24px',
         }}>
           {(['login', 'register'] as const).map((m) => (
@@ -85,7 +85,7 @@ export function LoginScreen() {
                 fontSize: '13px',
                 fontWeight: 700,
                 background: mode === m ? 'var(--color-accent)' : 'transparent',
-                color: mode === m ? '#000' : '#555',
+                color: mode === m ? '#000' : '#ffffff',
                 border: 'none',
                 cursor: 'pointer',
                 transition: 'all 0.15s',
@@ -98,7 +98,7 @@ export function LoginScreen() {
 
         {/* Champ email */}
         <div style={{ marginBottom: '12px' }}>
-          <div style={{ fontSize: '11px', color: '#555', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '6px' }}>
+          <div style={{ fontSize: '11px', color: '#ffffff', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '6px' }}>
             EMAIL
           </div>
           <input
@@ -111,7 +111,7 @@ export function LoginScreen() {
             style={{
               width: '100%',
               background: '#1a1a1a',
-              border: '1px solid #2a2a2a',
+              border: '1px solid rgba(255,255,255,0.3)',
               borderRadius: '6px',
               padding: '10px 12px',
               color: '#f0f0f0',
@@ -125,7 +125,7 @@ export function LoginScreen() {
 
         {/* Champ mot de passe */}
         <div style={{ marginBottom: '20px' }}>
-          <div style={{ fontSize: '11px', color: '#555', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '6px' }}>
+          <div style={{ fontSize: '11px', color: '#ffffff', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '6px' }}>
             MOT DE PASSE
           </div>
           <input
@@ -138,7 +138,7 @@ export function LoginScreen() {
             style={{
               width: '100%',
               background: '#1a1a1a',
-              border: '1px solid #2a2a2a',
+              border: '1px solid rgba(255,255,255,0.3)',
               borderRadius: '6px',
               padding: '10px 12px',
               color: '#f0f0f0',
@@ -172,7 +172,7 @@ export function LoginScreen() {
           style={{
             width: '100%',
             background: loading ? '#1a1a1a' : 'var(--color-accent)',
-            color: loading ? '#333' : '#000',
+            color: loading ? '#ffffff' : '#000',
             border: 'none',
             borderRadius: '8px',
             padding: '14px',

@@ -87,7 +87,7 @@ export function CaptureScreen() {
     <div style={{ padding: '16px 20px 0' }}>
       {/* Sous-titre + toggle */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-        <p style={{ margin: 0, fontSize: '14px', color: '#888', fontWeight: 500 }}>
+        <p style={{ margin: 0, fontSize: '14px', color: '#ffffff', fontWeight: 500 }}>
           {isDetailed ? 'Saisie détaillée avec qualification.' : 'Videz votre tête. Organisez plus tard.'}
         </p>
         <button
@@ -97,7 +97,7 @@ export function CaptureScreen() {
             border: `1px solid ${isDetailed ? 'var(--color-accent)' : '#2a2a2a'}`,
             borderRadius: '6px',
             padding: '6px 12px',
-            color: isDetailed ? 'var(--color-accent)' : '#555',
+            color: isDetailed ? 'var(--color-accent)' : '#ffffff',
             fontSize: '11px',
             fontWeight: 600,
             letterSpacing: '0.06em',
@@ -122,7 +122,7 @@ export function CaptureScreen() {
         <div
           style={{
             background: '#0f0f0f',
-            border: '1px solid #2a2a2a',
+            border: '1px solid rgba(255,255,255,0.3)',
             borderRadius: '10px',
             padding: '16px',
             marginBottom: '24px',
@@ -154,10 +154,10 @@ export function CaptureScreen() {
               onChange={(e) => setSelectedCategoryId(e.target.value)}
               style={{
                 background: '#1a1a1a',
-                border: '1px solid #2a2a2a',
+                border: '1px solid rgba(255,255,255,0.3)',
                 borderRadius: '5px',
                 padding: '6px 10px',
-                color: selectedCategoryId ? '#f0f0f0' : '#555',
+                color: selectedCategoryId ? '#f0f0f0' : '#ffffff',
                 fontSize: '12px',
                 cursor: 'pointer',
                 appearance: 'none',
@@ -175,7 +175,7 @@ export function CaptureScreen() {
                 onChange={(e) => setSelectedDeliverableId(e.target.value)}
                 style={{
                   background: '#1a1a1a',
-                  border: '1px solid #2a2a2a',
+                  border: '1px solid rgba(255,255,255,0.3)',
                   borderRadius: '5px',
                   padding: '6px 10px',
                   color: '#f0f0f0',
@@ -197,7 +197,7 @@ export function CaptureScreen() {
               style={{
                 marginLeft: 'auto',
                 background: title.trim() ? 'var(--color-accent)' : '#1a1a1a',
-                color: title.trim() ? '#000' : '#333',
+                color: title.trim() ? '#000' : '#ffffff',
                 border: 'none',
                 borderRadius: '6px',
                 padding: '8px 20px',
@@ -215,7 +215,7 @@ export function CaptureScreen() {
       {/* Captures de la session */}
       {recentCaptures.length > 0 && (
         <div>
-          <p style={{ fontSize: '11px', color: '#333', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '12px' }}>
+          <p style={{ fontSize: '11px', color: '#ffffff', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '12px' }}>
             AJOUTÉES CETTE SESSION
           </p>
           {recentCaptures.map((t) => {
@@ -240,7 +240,7 @@ export function CaptureScreen() {
                     flexShrink: 0,
                   }}
                 />
-                <span style={{ fontSize: '13px', color: '#888', flex: 1 }}>{t.title}</span>
+                <span style={{ fontSize: '13px', color: '#ffffff', flex: 1 }}>{t.title}</span>
 
                 {cat ? (
                   <span style={{ fontSize: '10px', color: cat.color }}>{cat.name}</span>
@@ -252,7 +252,7 @@ export function CaptureScreen() {
                     style={{
                       background: 'transparent',
                       border: 'none',
-                      color: '#333',
+                      color: '#ffffff',
                       fontSize: '10px',
                       cursor: 'pointer',
                       appearance: 'none',
@@ -273,7 +273,7 @@ export function CaptureScreen() {
       {/* Tâches non organisées existantes */}
       {tasks.filter((t) => t.status === 'new' && !recentCaptures.find((r) => r.id === t.id)).length > 0 && (
         <div style={{ marginTop: recentCaptures.length > 0 ? '24px' : 0 }}>
-          <p style={{ fontSize: '11px', color: '#333', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '12px' }}>
+          <p style={{ fontSize: '11px', color: '#ffffff', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '12px' }}>
             NOUVELLES — {tasks.filter((t) => t.status === 'new').length}
           </p>
           {tasks.filter((t) => t.status === 'new' && !recentCaptures.find((r) => r.id === t.id)).map((t) => {
@@ -284,10 +284,10 @@ export function CaptureScreen() {
                 style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 0', borderBottom: '1px solid #111' }}
               >
                 <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#333', flexShrink: 0 }} />
-                <span style={{ fontSize: '13px', color: '#666', flex: 1 }}>{t.title}</span>
+                <span style={{ fontSize: '13px', color: '#ffffff', flex: 1 }}>{t.title}</span>
                 {cat
                   ? <span style={{ fontSize: '10px', color: cat.color }}>{cat.name}</span>
-                  : <span style={{ fontSize: '10px', color: '#333' }}>Non organisée</span>
+                  : <span style={{ fontSize: '10px', color: '#ffffff' }}>Non organisée</span>
                 }
               </div>
             )

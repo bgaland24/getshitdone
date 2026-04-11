@@ -10,7 +10,7 @@ export default defineConfig({
   timeout: 15_000,
   retries: 0,
   maxFailures: 3,   // Stoppe après 3 échecs
-  workers: 1,       // Tests séquentiels — BDD partagée
+  workers: 1,       // 2 workers — les suites qui mutent le compte seedé sont marquées serial
 
   use: {
     baseURL: 'http://localhost:5173',
@@ -38,12 +38,16 @@ export default defineConfig({
       reuseExistingServer: true,
       timeout: 30_000,
       env: { DATABASE_URL: 'sqlite:///intentionality_test.db' },
+      stdout: 'ignore',
+      stderr: 'ignore',
     },
     {
       command: 'npm run dev',
       url: 'http://localhost:5173',
       reuseExistingServer: true,
       timeout: 15_000,
+      stdout: 'ignore',
+      stderr: 'ignore',
     },
   ],
 

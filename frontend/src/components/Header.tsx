@@ -2,21 +2,12 @@
  * Header fixe — branding "intent." + indicateur session active + score du jour.
  */
 
-import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { fetchTodayScore } from '../api/scores'
 import { useTaskStore } from '../store/taskStore'
 
 export function Header() {
   const navigate = useNavigate()
-  const [score, setScore] = useState<number | null>(null)
   const activeSession = useTaskStore((s) => s.activeSession)
-
-  useEffect(() => {
-    fetchTodayScore()
-      .then((s) => setScore(s.global_score))
-      .catch(() => { /* silencieux en dev */ })
-  }, [])
 
   return (
     <header
@@ -38,21 +29,13 @@ export function Header() {
         intent<span style={{ color: 'var(--color-accent)' }}>.</span>
       </span>
 
-      {/* Centre : score du jour ou indicateur session active */}
+      {/* Centre : indicateur session active uniquement */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
-        {activeSession ? (
+        {activeSession && (
           <>
             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4CAF7D', display: 'inline-block' }} />
             <span style={{ fontSize: '11px', color: '#4CAF7D' }}>En cours</span>
           </>
-        ) : (
-          <span style={{ fontSize: '13px', color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-            {score !== null ? (
-              <>{Math.round(score)}<span style={{ color: 'var(--color-accent)' }}>%</span></>
-            ) : (
-              <span style={{ color: 'var(--color-border-medium)' }}>—%</span>
-            )}
-          </span>
         )}
       </div>
 
@@ -63,10 +46,10 @@ export function Header() {
           aria-label="Paramètres"
           style={{
             background: 'none',
-            border: '1px solid #2a2a2a',
+            border: '1px solid #ffffff',
             borderRadius: '6px',
             padding: '5px 10px',
-            color: '#555',
+            color: '#ffffff',
             fontSize: '11px',
             fontWeight: 600,
             letterSpacing: '0.06em',

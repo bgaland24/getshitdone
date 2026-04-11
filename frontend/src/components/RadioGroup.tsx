@@ -27,7 +27,7 @@ export function RadioGroup({
       <div
         style={{
           fontSize: '11px',
-          color: 'rgba(255,255,255,0.45)',
+          color: '#ffffff',
           letterSpacing: '0.08em',
           fontWeight: 600,
           marginBottom: '10px',
@@ -52,9 +52,9 @@ export function RadioGroup({
                 flex: 1,
                 padding: '7px 6px',
                 borderRadius: '6px',
-                border: `1px solid ${isSelected ? activeColor : 'rgba(255,255,255,0.35)'}`,
+                border: `1px solid ${isSelected ? activeColor : '#ffffff'}`,
                 background: isSelected ? activeColor + '22' : 'transparent',
-                color: isSelected ? activeColor : 'rgba(255,255,255,0.75)',
+                color: isSelected ? activeColor : '#ffffff',
                 fontSize: '12px',
                 cursor: 'pointer',
                 fontWeight: isSelected ? 600 : 400,

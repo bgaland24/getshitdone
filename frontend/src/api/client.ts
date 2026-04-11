@@ -1,6 +1,8 @@
 /**
  * Instance Axios configurée pour toutes les requêtes vers l'API Flask.
  * Injecte automatiquement le Bearer token et gère le refresh silencieux.
+ * Le refresh est sérialisé via une promesse partagée pour éviter les race conditions
+ * quand plusieurs requêtes expirent simultanément.
  */
 
 import axios from 'axios'
@@ -10,6 +12,9 @@ export const apiClient = axios.create({
   baseURL: '/api',
   headers: { 'Content-Type': 'application/json' },
 })
+
+/** Promesse de refresh en cours — partagée entre toutes les requêtes en attente */
+let refreshPromise: Promise<string> | null = null
 
 /* ── Intercepteur requête : ajoute le token d'accès ── */
 apiClient.interceptors.request.use((config) => {
@@ -41,15 +46,27 @@ apiClient.interceptors.response.use(
         return Promise.reject(error)
       }
 
+      // Sérialiser les refreshes : si un refresh est déjà en cours, attendre sa résolution
+      if (!refreshPromise) {
+        refreshPromise = axios
+          .post('/api/auth/refresh', { refresh_token: refreshToken })
+          .then(({ data }) => {
+            const accessToken = data?.data?.access_token ?? data?.access_token
+            useAuthStore.getState().setAccessToken(accessToken)
+            return accessToken
+          })
+          .catch((err) => {
+            useAuthStore.getState().clearAuth()
+            throw err
+          })
+          .finally(() => { refreshPromise = null })
+      }
+
       try {
-        const { data } = await axios.post('/api/auth/refresh', { refresh_token: refreshToken })
-        // La réponse est aussi wrappée — désemballer manuellement ici
-        const accessToken = data?.data?.access_token ?? data?.access_token
-        useAuthStore.getState().setAccessToken(accessToken)
+        const accessToken = await refreshPromise
         originalRequest.headers.Authorization = `Bearer ${accessToken}`
         return apiClient(originalRequest)
       } catch {
-        useAuthStore.getState().clearAuth()
         return Promise.reject(error)
       }
     }

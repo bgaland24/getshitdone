@@ -60,7 +60,7 @@ export function KanbanColumn({
           style={{
             fontSize: '11px',
             fontWeight: 600,
-            color: '#666',
+            color: '#ffffff',
             letterSpacing: '0.04em',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -72,7 +72,7 @@ export function KanbanColumn({
         <span
           style={{
             fontSize: '10px',
-            color: '#333',
+            color: '#ffffff',
             fontFamily: 'var(--font-mono)',
             flexShrink: 0,
             marginLeft: '6px',
@@ -99,7 +99,7 @@ export function KanbanColumn({
               borderRadius: '6px',
               padding: '16px',
               textAlign: 'center',
-              color: '#2a2a2a',
+              color: '#ffffff',
               fontSize: '11px',
               letterSpacing: '0.04em',
             }}

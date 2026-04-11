@@ -169,7 +169,7 @@ export function OrganizeScreen() {
 
       {/* État vide */}
       {isEmpty && (
-        <p style={{ fontSize: '13px', color: '#333', textAlign: 'center', marginTop: '40px' }}>
+        <p style={{ fontSize: '13px', color: '#ffffff', textAlign: 'center', marginTop: '40px' }}>
           Aucune tâche dans cette vue.
         </p>
       )}

@@ -49,7 +49,7 @@ export function MoveSheet({ task, categories, deliverables, onMove, onClose }: M
           zIndex: 200,
           background: '#111',
           borderRadius: '12px 12px 0 0',
-          borderTop: '1px solid #2a2a2a',
+          borderTop: '1px solid #ffffff',
           maxHeight: '75vh',
           display: 'flex',
           flexDirection: 'column',
@@ -67,12 +67,12 @@ export function MoveSheet({ task, categories, deliverables, onMove, onClose }: M
           }}
         >
           <div>
-            <p style={{ margin: 0, fontSize: '11px', color: '#444', letterSpacing: '0.06em' }}>DÉPLACER</p>
+            <p style={{ margin: 0, fontSize: '11px', color: '#ffffff', letterSpacing: '0.06em' }}>DÉPLACER</p>
             <p
               style={{
                 margin: '2px 0 0',
                 fontSize: '14px',
-                color: '#ccc',
+                color: '#ffffff',
                 fontWeight: 600,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -88,7 +88,7 @@ export function MoveSheet({ task, categories, deliverables, onMove, onClose }: M
             style={{
               background: 'none',
               border: 'none',
-              color: '#555',
+              color: '#ffffff',
               fontSize: '18px',
               cursor: 'pointer',
               padding: '4px',
@@ -187,10 +187,10 @@ function DestRow({
         }}
       />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ margin: 0, fontSize: '14px', color: isCurrent ? '#f0f0f0' : '#888', fontWeight: isCurrent ? 600 : 400 }}>
+        <p style={{ margin: 0, fontSize: '14px', color: '#ffffff', fontWeight: isCurrent ? 600 : 400 }}>
           {label}
         </p>
-        <p style={{ margin: 0, fontSize: '11px', color: '#444' }}>{sublabel}</p>
+        <p style={{ margin: 0, fontSize: '11px', color: '#ffffff' }}>{sublabel}</p>
       </div>
       {isCurrent && (
         <span style={{ color, fontSize: '14px', flexShrink: 0 }}>✓</span>

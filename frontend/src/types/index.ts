@@ -79,35 +79,34 @@ export interface WorkSession {
 /* ─── Scores ─────────────────────────────────────────────────────────── */
 
 export interface TodayScore {
-  global_score: number            // 0–100
-  intentionality_score: number    // sous-score
-  efficiency_score: number        // sous-score
-  engagement_score: number        // sous-score
-  date: string
+  global: number        // score global 0–100
+  priorities: number    // sous-score respect des priorités
+  allocations: number   // sous-score allocations temporelles
+  closure: number       // sous-score qualité de clôture
 }
 
 export interface WeeklyScore {
-  global_score: number
-  intentionality_score: number
-  efficiency_score: number
-  engagement_score: number
-  week_start: string
-  week_end: string
-  category_breakdown: CategoryScore[]
+  global: number
+  priorities: number
+  allocations: number
+  closure: number
+  categories: CategoryScore[]
 }
 
 export interface CategoryScore {
   category_id: string
   category_name: string
-  color: string
-  time_spent_minutes: number
-  weekly_target_minutes: number
-  completion_rate: number
+  category_color: string
+  actual_minutes: number
+  target_minutes: number
 }
 
 export interface HistoryEntry {
-  date: string
-  score: number
+  week_start: string
+  global: number
+  priorities: number
+  allocations: number
+  closure: number
 }
 
 /* ─── Auth ───────────────────────────────────────────────────────────── */

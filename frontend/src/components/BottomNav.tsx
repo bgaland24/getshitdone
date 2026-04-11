@@ -28,7 +28,6 @@ export function BottomNav() {
     { route: ROUTES.ORGANIZE,   label: 'Organiser',  icon: '≡' },
     { route: ROUTES.QUALIFY,    label: 'Qualifier',  icon: '◈', badge: unqualifiedCount || undefined },
     { route: ROUTES.PRIORITIES, label: 'Priorités',  icon: '◎' },
-    { route: ROUTES.SCORE,      label: 'Score',      icon: '▲' },
   ]
 
   return (

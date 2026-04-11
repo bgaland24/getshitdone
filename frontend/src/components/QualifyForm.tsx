@@ -83,7 +83,7 @@ export function QualifyForm({
     })
   }
 
-  const horizonColor = horizonDate ? getHorizonColor(horizonDate) : '#555'
+  const horizonColor = horizonDate ? getHorizonColor(horizonDate) : '#ffffff'
 
   return (
     <form onSubmit={handleSubmit}>
@@ -91,7 +91,7 @@ export function QualifyForm({
       {progress && (
         <div style={{ marginBottom: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-            <span style={{ fontSize: '11px', color: '#555', letterSpacing: '0.06em' }}>SESSION DE QUALIFICATION</span>
+            <span style={{ fontSize: '11px', color: '#ffffff', letterSpacing: '0.06em' }}>SESSION DE QUALIFICATION</span>
             <span style={{ fontSize: '11px', color: 'var(--color-accent)', fontFamily: 'var(--font-mono)' }}>
               {progress.current}/{progress.total}
             </span>
@@ -116,7 +116,7 @@ export function QualifyForm({
         padding: '14px 16px',
         marginBottom: '20px',
       }}>
-        <p style={{ margin: '0 0 4px', fontSize: '11px', color: '#444', letterSpacing: '0.06em' }}>TÂCHE</p>
+        <p style={{ margin: '0 0 4px', fontSize: '11px', color: '#ffffff', letterSpacing: '0.06em' }}>TÂCHE</p>
         <p style={{ margin: 0, fontSize: '15px', color: '#f0f0f0', fontWeight: 600, lineHeight: 1.4 }}>
           {task.title}
         </p>
@@ -129,11 +129,11 @@ export function QualifyForm({
       {/* Catégorie + livrable */}
       <div style={{ marginBottom: '16px', display: 'flex', gap: '10px' }}>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: '11px', color: '#555', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '6px' }}>CATÉGORIE</div>
+          <div style={{ fontSize: '11px', color: '#ffffff', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '6px' }}>CATÉGORIE</div>
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            style={{ width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '6px', padding: '7px 10px', color: categoryId ? '#f0f0f0' : '#555', fontSize: '13px', outline: 'none', cursor: 'pointer' }}
+            style={{ width: '100%', background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '6px', padding: '7px 10px', color: categoryId ? '#f0f0f0' : '#ffffff', fontSize: '13px', outline: 'none', cursor: 'pointer' }}
           >
             <option value="">Sans catégorie</option>
             {categories.map((cat) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
@@ -141,11 +141,11 @@ export function QualifyForm({
         </div>
         {categoryId && (
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '11px', color: '#555', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '6px' }}>LIVRABLE</div>
+            <div style={{ fontSize: '11px', color: '#ffffff', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '6px' }}>LIVRABLE</div>
             <select
               value={deliverableId}
               onChange={(e) => setDeliverableId(e.target.value)}
-              style={{ width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: '6px', padding: '7px 10px', color: deliverableId ? '#f0f0f0' : '#555', fontSize: '13px', outline: 'none', cursor: 'pointer' }}
+              style={{ width: '100%', background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '6px', padding: '7px 10px', color: deliverableId ? '#f0f0f0' : '#ffffff', fontSize: '13px', outline: 'none', cursor: 'pointer' }}
             >
               <option value="">Sans livrable</option>
               {filteredDeliverables.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
@@ -180,7 +180,7 @@ export function QualifyForm({
 
       {/* Horizon + Durée */}
       <div style={{ marginBottom: '16px' }}>
-        <div style={{ fontSize: '11px', color: '#555', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <div style={{ fontSize: '11px', color: '#ffffff', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
           HORIZON <span style={{ color: '#E86B3E' }}>*</span>
           {horizonDate && (
             <span style={{ color: horizonColor, fontFamily: 'var(--font-mono)', fontSize: '10px', marginLeft: '6px' }}>
@@ -207,9 +207,9 @@ export function QualifyForm({
                   flex: 1,
                   padding: '7px 6px',
                   borderRadius: '6px',
-                  border: `1px solid ${isSelected ? color : '#2a2a2a'}`,
+                  border: `1px solid ${isSelected ? color : '#ffffff'}`,
                   background: isSelected ? color + '22' : 'transparent',
-                  color: isSelected ? color : '#555',
+                  color: isSelected ? color : '#ffffff',
                   fontSize: '12px',
                   cursor: 'pointer',
                   fontWeight: isSelected ? 600 : 400,
@@ -236,7 +236,7 @@ export function QualifyForm({
               border: `1px solid ${horizonDate ? horizonColor + '60' : '#2a2a2a'}`,
               borderRadius: '6px',
               padding: '7px 10px',
-              color: horizonDate ? horizonColor : '#555',
+              color: horizonDate ? horizonColor : '#ffffff',
               fontSize: '13px',
               fontFamily: 'var(--font-mono)',
               outline: 'none',
@@ -255,10 +255,10 @@ export function QualifyForm({
             style={{
               flex: 1,
               background: '#1a1a1a',
-              border: '1px solid #2a2a2a',
+              border: '1px solid rgba(255,255,255,0.3)',
               borderRadius: '6px',
               padding: '7px 6px',
-              color: estimatedMinutes ? '#f0f0f0' : '#555',
+              color: estimatedMinutes ? '#f0f0f0' : '#ffffff',
               fontSize: '12px',
               fontFamily: 'var(--font-mono)',
               outline: 'none',
@@ -298,10 +298,10 @@ export function QualifyForm({
             style={{
               flex: 1,
               background: '#0f0f0f',
-              border: '1px solid #2a2a2a',
+              border: '1px solid rgba(255,255,255,0.3)',
               borderRadius: '8px',
               padding: '14px',
-              color: '#888',
+              color: '#ffffff',
               fontSize: '14px',
               fontWeight: 700,
               cursor: 'pointer',
@@ -316,7 +316,7 @@ export function QualifyForm({
           style={{
             flex: 2,
             background: isValid ? 'var(--color-accent)' : '#1a1a1a',
-            color: isValid ? '#000' : '#333',
+            color: isValid ? '#000' : '#ffffff',
             border: 'none',
             borderRadius: '8px',
             padding: '14px',
