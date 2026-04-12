@@ -44,5 +44,22 @@ def run_migrations() -> None:
             ))
             logger.info("Migration : colonne tasks.priority_current_date ajoutée")
 
+    # Création de la table de tokens de réinitialisation de mot de passe
+    if not _table_exists("password_reset_tokens"):
+        db.session.execute(db.text("""
+            CREATE TABLE password_reset_tokens (
+                id         TEXT PRIMARY KEY,
+                token      TEXT NOT NULL UNIQUE,
+                user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                expires_at DATETIME NOT NULL,
+                used       INTEGER NOT NULL DEFAULT 0,
+                created_at DATETIME NOT NULL
+            )
+        """))
+        db.session.execute(db.text(
+            "CREATE INDEX IF NOT EXISTS ix_prt_token ON password_reset_tokens(token)"
+        ))
+        logger.info("Migration : table password_reset_tokens créée")
+
     db.session.commit()
     logger.info("Migrations terminées")

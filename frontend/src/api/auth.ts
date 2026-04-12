@@ -30,3 +30,13 @@ export async function refresh(): Promise<AuthTokens> {
   const { data } = await apiClient.post<AuthTokens>('/auth/refresh')
   return data
 }
+
+/** Déclenche l'envoi d'un email de réinitialisation de mot de passe */
+export async function forgotPassword(email: string): Promise<void> {
+  await apiClient.post('/auth/forgot-password', { email })
+}
+
+/** Réinitialise le mot de passe avec le token reçu par email */
+export async function resetPassword(token: string, password: string): Promise<void> {
+  await apiClient.post('/auth/reset-password', { token, password })
+}

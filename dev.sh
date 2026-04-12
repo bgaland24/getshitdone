@@ -19,6 +19,12 @@ trap cleanup EXIT INT TERM
 # ── Backend ────────────────────────────────────────────────────────────
 echo "[backend] Démarrage Flask sur http://localhost:5000"
 cd "$ROOT/backend"
+
+# Secrets locaux — à renseigner ici pour le dev (ne jamais committer de vraies valeurs)
+# export GMAIL_USER="ton.adresse@gmail.com"
+# export GMAIL_APP_PASSWORD="xxxx xxxx xxxx xxxx"
+# export FRONTEND_BASE_URL="http://localhost:5173"
+
 python run.py &
 BACKEND_PID=$!
 

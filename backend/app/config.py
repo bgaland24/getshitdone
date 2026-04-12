@@ -16,6 +16,16 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRY_HOURS = 24
     JWT_REFRESH_TOKEN_EXPIRY_DAYS = 30
 
+    # Envoi d'email via Gmail SMTP (App Password Google requis)
+    GMAIL_USER = os.environ.get("GMAIL_USER", "")
+    GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
+
+    # URL du frontend — utilisée pour construire le lien de réinitialisation dans l'email
+    FRONTEND_BASE_URL = os.environ.get("FRONTEND_BASE_URL", "http://localhost:5173")
+
+    # Durée de validité d'un token de réinitialisation de mot de passe (en minutes)
+    PASSWORD_RESET_TOKEN_EXPIRY_MINUTES = 15
+
     # SQLAlchemy
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

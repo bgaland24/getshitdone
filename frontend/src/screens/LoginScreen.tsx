@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { login, register } from '../api/auth'
 import { useAuthStore } from '../store/authStore'
 import { ROUTES } from '../constants'
@@ -163,6 +163,15 @@ export function LoginScreen() {
           }}>
             {error}
           </p>
+        )}
+
+        {/* Lien mot de passe oublié — visible uniquement en mode connexion */}
+        {mode === 'login' && (
+          <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+            <Link to="/forgot-password" style={{ fontSize: '12px', color: '#aaaaaa', textDecoration: 'none' }}>
+              Mot de passe oublié ?
+            </Link>
+          </div>
         )}
 
         {/* Bouton submit */}

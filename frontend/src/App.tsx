@@ -14,8 +14,10 @@ import { OrganizeScreen }   from './screens/OrganizeScreen'
 import { QualifyScreen }    from './screens/QualifyScreen'
 import { PrioritiesScreen } from './screens/PrioritiesScreen'
 import { ScoreScreen }      from './screens/ScoreScreen'
-import { LoginScreen }      from './screens/LoginScreen'
-import { ManageScreen }     from './screens/ManageScreen'
+import { LoginScreen }          from './screens/LoginScreen'
+import { ManageScreen }          from './screens/ManageScreen'
+import { ForgotPasswordScreen }  from './screens/ForgotPasswordScreen'
+import { ResetPasswordScreen }   from './screens/ResetPasswordScreen'
 
 /** Wrapper qui redirige vers /login si l'utilisateur n'est pas connecté */
 function ProtectedLayout() {
@@ -52,8 +54,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<LoginScreen />} />
-        <Route path="/*"    element={<ProtectedLayout />} />
+        <Route path="/login"                  element={<LoginScreen />} />
+        <Route path="/forgot-password"        element={<ForgotPasswordScreen />} />
+        <Route path="/reset-password/:token"  element={<ResetPasswordScreen />} />
+        <Route path="/*"                      element={<ProtectedLayout />} />
       </Routes>
     </BrowserRouter>
   )

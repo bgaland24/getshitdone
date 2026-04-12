@@ -1,7 +1,3 @@
-Bonne question avant de passer au vrai code. Voici l'analyse complète.
-
----
-
 ## Style visuel
 
 **Palette**

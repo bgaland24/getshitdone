@@ -18,6 +18,7 @@ env/
 backend/wsgi.py
 .env
 *.env
+dev.sh
 
 # Frontend — fichiers générés
 frontend/node_modules/

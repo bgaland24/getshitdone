@@ -2,9 +2,11 @@
 Blueprint auth — routes d'inscription, connexion et renouvellement de token.
 """
 
-from flask import Blueprint, request
+from flask import Blueprint, request, current_app
 
 from app.services.auth_service import AuthService
+from app.services.email_service import EmailService
+from app.services.password_reset_service import PasswordResetService
 from app.utils.response import success, error
 
 auth_blueprint = Blueprint("auth", __name__, url_prefix="/api/auth")
@@ -78,3 +80,58 @@ def refresh():
     access_token = auth_service.generate_access_token(user)
 
     return success({"access_token": access_token})
+
+
+def _get_password_reset_service() -> PasswordResetService:
+    """
+    Factory — construit le PasswordResetService avec les credentials SMTP issus de la config.
+    Instancié à la demande (et non au chargement du module) car current_app requiert
+    un contexte d'application Flask actif.
+    """
+    email_service = EmailService(
+        gmail_user=current_app.config["GMAIL_USER"],
+        gmail_app_password=current_app.config["GMAIL_APP_PASSWORD"],
+    )
+    return PasswordResetService(email_service)
+
+
+@auth_blueprint.post("/forgot-password")
+def forgot_password():
+    """
+    Déclenche l'envoi d'un email de réinitialisation.
+    Retourne toujours HTTP 200 avec le même message, que l'email existe ou non (anti-énumération).
+    """
+    data = request.get_json(silent=True) or {}
+    email = data.get("email", "").strip().lower()
+
+    if not email:
+        return error("Email obligatoire")
+
+    service = _get_password_reset_service()
+    service.request_reset(email, current_app.config["FRONTEND_BASE_URL"])
+
+    return success({
+        "message": "Si cet email est enregistré, un lien de réinitialisation a été envoyé."
+    })
+
+
+@auth_blueprint.post("/reset-password")
+def reset_password():
+    """Valide le token de réinitialisation et met à jour le mot de passe."""
+    data = request.get_json(silent=True) or {}
+    token = data.get("token", "").strip()
+    password = data.get("password", "")
+
+    if not token or not password:
+        return error("Token et nouveau mot de passe obligatoires")
+
+    if len(password) < 8:
+        return error("Le mot de passe doit contenir au moins 8 caractères")
+
+    try:
+        service = _get_password_reset_service()
+        service.reset_password(token, password)
+    except ValueError as exc:
+        return error(str(exc), 400)
+
+    return success({"message": "Mot de passe mis à jour avec succès."})
