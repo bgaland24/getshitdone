@@ -4,7 +4,7 @@ Pattern factory pour permettre les tests et le déploiement multi-environnements
 """
 
 import os
-from flask import Flask, send_from_directory, jsonify
+from flask import Flask, send_from_directory, jsonify, request as flask_request
 from flask_cors import CORS
 
 from app.database import db
@@ -27,6 +27,9 @@ def create_app(config_name: str = None) -> Flask:
 
     # CORS : autorise le frontend React en développement
     CORS(flask_app, resources={r"/api/*": {"origins": "*"}})
+
+    # Content Security Policy — appliquée sur toutes les réponses
+    _register_security_headers(flask_app)
 
     # Initialisation de la base de données
     db.init_app(flask_app)
@@ -57,6 +60,63 @@ def create_app(config_name: str = None) -> Flask:
         return jsonify({"message": "API Intentionality App"}), 200
 
     return flask_app
+
+
+def _register_security_headers(flask_app: Flask) -> None:
+    """
+    Ajoute les en-têtes de sécurité HTTP sur toutes les réponses.
+
+    CSP en mode report-only en développement (pas de blocage, juste des avertissements
+    dans la console) et en mode enforce en production.
+    Les routes /api/* reçoivent uniquement les headers non-CSP (évite les conflits CORS).
+    """
+
+    # Directives CSP communes aux deux environnements
+    _CSP_DIRECTIVES = "; ".join([
+        "default-src 'self'",
+        # Scripts : uniquement 'self' — pas d'eval, pas d'inline (React buildé sans)
+        "script-src 'self'",
+        # Styles : unsafe-inline requis car Tailwind + React injectent des styles inline
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        # Polices Google Fonts
+        "font-src 'self' https://fonts.gstatic.com",
+        # Requêtes XHR/fetch : uniquement 'self' (API sur même origine en prod)
+        "connect-src 'self'",
+        # Images : 'self' + data: (favicon SVG inline, éventuels avatars base64)
+        "img-src 'self' data:",
+        # Pas d'embedding dans des frames tiers — protection clickjacking
+        "frame-ancestors 'none'",
+        # Pas de plugins (Flash, etc.)
+        "object-src 'none'",
+        # Pas de <base> piratée
+        "base-uri 'self'",
+        # Formulaires : uniquement 'self'
+        "form-action 'self'",
+    ])
+
+    is_production = flask_app.config.get("DEBUG") is False
+
+    @flask_app.after_request
+    def add_security_headers(response):
+        """Injecte les en-têtes de sécurité sur chaque réponse."""
+        # Pas de CSP sur les routes API (réponses JSON — les navigateurs n'en ont pas besoin,
+        # et cela évite tout conflit avec les en-têtes CORS déjà présents)
+        if flask_request.path.startswith("/api/"):
+            return response
+
+        if is_production:
+            # Mode enforce — bloque les ressources non conformes
+            response.headers["Content-Security-Policy"] = _CSP_DIRECTIVES
+        else:
+            # Mode report-only — log dans la console sans bloquer (utile en dev)
+            response.headers["Content-Security-Policy-Report-Only"] = _CSP_DIRECTIVES
+
+        # En-têtes complémentaires indépendants de l'environnement
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+
+        return response
 
 
 def _register_blueprints(flask_app: Flask) -> None:
