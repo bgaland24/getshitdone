@@ -5,16 +5,16 @@
  * Tri configurable via les préférences utilisateur.
  */
 
-import { useEffect, useRef, useState } from 'react'
-import { fetchTasks, startTask, pauseTask, doneTask, undoneTask, pinTask, unpinTask, qualifyTask } from '../api/tasks'
+import { useEffect, /* useRef, */ useState } from 'react'
+import { fetchTasks, /* startTask, pauseTask, */ doneTask, undoneTask, pinTask, unpinTask, qualifyTask } from '../api/tasks'
 import { fetchCategories, fetchDeliverables } from '../api/categories'
-import { fetchSessions } from '../api/sessions'
+// import { fetchSessions } from '../api/sessions'  // désactivé : timer démarrer/pause
 import { fetchPreferences } from '../api/preferences'
 import { useTaskStore } from '../store/taskStore'
 import { Badge } from '../components/Badge'
 import { QualifyForm } from '../components/QualifyForm'
 import { getHorizonColor, getHorizonLabel, MAX_PINNED_PER_DATE } from '../constants'
-import type { Task, WorkSession, SortAxis, Category, QualifyTaskPayload } from '../types'
+import type { Task, /* WorkSession, */ SortAxis, Category, QualifyTaskPayload } from '../types'
 
 type Mode = 'today' | 'tomorrow'
 
@@ -53,11 +53,11 @@ function sortTasks(tasks: Task[], axes: SortAxis[]): Task[] {
 
 export function PrioritiesScreen() {
   const [mode, setMode] = useState<Mode>('today')
-  const [activeSession, setActiveSession] = useState<WorkSession | null>(null)
   const [sortAxes, setSortAxes] = useState<SortAxis[]>(['horizon', 'delegation', 'urgency', 'importance'])
   const [loading, setLoading] = useState(false)
   const [requalifyTask, setRequalifyTask] = useState<Task | null>(null)
   const { tasks, categories, deliverables, setTasks, setCategories, setDeliverables, updateTask: storeUpdate } = useTaskStore()
+  // const [activeSession, setActiveSession] = useState<WorkSession | null>(null) // désactivé : timer démarrer/pause
 
   const todayStr    = modeDate('today')
   const tomorrowStr = modeDate('tomorrow')
@@ -88,34 +88,33 @@ export function PrioritiesScreen() {
     const safeFetchPreferences = () =>
       fetchPreferences().catch(() => ({ user_id: '', sort_axes: DEFAULT_SORT_AXES }))
 
-    Promise.all([fetchTasks(), fetchCategories(), fetchDeliverables(), fetchSessions({ date: todayStr }), safeFetchPreferences()])
-      .then(([t, c, d, sessions, prefs]) => {
+    Promise.all([fetchTasks(), fetchCategories(), fetchDeliverables(), safeFetchPreferences()])
+      .then(([t, c, d, prefs]) => {
         setTasks(t)
         setCategories(c)
         setDeliverables(d)
-        setActiveSession(sessions.find((s) => s.stopped_at === null) ?? null)
         setSortAxes(prefs.sort_axes)
       })
   }, [])
 
-  async function handleStart(task: Task) {
-    setLoading(true)
-    try {
-      const result = await startTask(task.id)
-      storeUpdate(result.task)
-      const sessions = await fetchSessions({ date: todayStr })
-      setActiveSession(sessions.find((s) => s.stopped_at === null) ?? null)
-    } finally { setLoading(false) }
-  }
+  // async function handleStart(task: Task) {
+  //   setLoading(true)
+  //   try {
+  //     const result = await startTask(task.id)
+  //     storeUpdate(result.task)
+  //     const sessions = await fetchSessions({ date: todayStr })
+  //     setActiveSession(sessions.find((s) => s.stopped_at === null) ?? null)
+  //   } finally { setLoading(false) }
+  // }
 
-  async function handlePause(task: Task) {
-    setLoading(true)
-    try {
-      const result = await pauseTask(task.id)
-      storeUpdate(result.task)
-      setActiveSession(null)
-    } finally { setLoading(false) }
-  }
+  // async function handlePause(task: Task) {
+  //   setLoading(true)
+  //   try {
+  //     const result = await pauseTask(task.id)
+  //     storeUpdate(result.task)
+  //     setActiveSession(null)
+  //   } finally { setLoading(false) }
+  // }
 
   async function handleDone(task: Task) {
     setLoading(true)
@@ -188,11 +187,11 @@ export function PrioritiesScreen() {
               task={task}
               category={categories.find((c) => c.id === task.category_id) ?? null}
               isPinned
-              isActive={task.status === 'in_progress'}
-              activeSession={task.status === 'in_progress' ? activeSession : null}
+              // isActive={task.status === 'in_progress'}      // désactivé : timer
+              // activeSession={task.status === 'in_progress' ? activeSession : null}
               loading={loading}
-              onStart={handleStart}
-              onPause={handlePause}
+              // onStart={handleStart}   // désactivé : timer
+              // onPause={handlePause}   // désactivé : timer
               onDone={handleDone}
               onUndone={handleUndone}
               onUnpin={handleUnpin}
@@ -220,12 +219,12 @@ export function PrioritiesScreen() {
               task={task}
               category={categories.find((c) => c.id === task.category_id) ?? null}
               isPinned={false}
-              isActive={task.status === 'in_progress'}
-              activeSession={task.status === 'in_progress' ? activeSession : null}
+              // isActive={task.status === 'in_progress'}      // désactivé : timer
+              // activeSession={task.status === 'in_progress' ? activeSession : null}
               loading={loading}
               canPin={canPin}
-              onStart={handleStart}
-              onPause={handlePause}
+              // onStart={handleStart}   // désactivé : timer
+              // onPause={handlePause}   // désactivé : timer
               onDone={handleDone}
               onUndone={handleUndone}
               onPin={handlePin}
@@ -310,12 +309,12 @@ function PriorityTaskCard({
   task,
   category,
   isPinned,
-  isActive,
-  activeSession,
+  // isActive,       // désactivé : timer démarrer/pause
+  // activeSession,  // désactivé : timer démarrer/pause
   loading,
   canPin,
-  onStart,
-  onPause,
+  // onStart,        // désactivé : timer démarrer/pause
+  // onPause,        // désactivé : timer démarrer/pause
   onDone,
   onUndone,
   onPin,
@@ -325,12 +324,12 @@ function PriorityTaskCard({
   task: Task
   category: Category | null
   isPinned: boolean
-  isActive: boolean
-  activeSession: WorkSession | null
+  // isActive: boolean             // désactivé : timer démarrer/pause
+  // activeSession: WorkSession | null  // désactivé : timer démarrer/pause
   loading: boolean
   canPin?: boolean
-  onStart: (t: Task) => void
-  onPause?: (t: Task) => void
+  // onStart: (t: Task) => void    // désactivé : timer démarrer/pause
+  // onPause?: (t: Task) => void   // désactivé : timer démarrer/pause
   onDone: (t: Task) => void
   onUndone: (t: Task) => void
   onPin?: (t: Task) => void
@@ -339,30 +338,30 @@ function PriorityTaskCard({
 }) {
   const isDone = task.status === 'done'
   const catColor = category?.color ?? '#ffffff'
-  const [elapsed, setElapsed] = useState(0)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  useEffect(() => {
-    if (isActive && activeSession) {
-      const start = new Date(activeSession.started_at).getTime()
-      setElapsed(Math.floor((Date.now() - start) / 1000))
-      intervalRef.current = setInterval(() => {
-        setElapsed(Math.floor((Date.now() - start) / 1000))
-      }, 1000)
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-      setElapsed(0)
-    }
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
-  }, [isActive, activeSession?.started_at])
-
-  const fmt = (s: number) =>
-    `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`
+  // Désactivé : timer en temps réel sur la session active
+  // const [elapsed, setElapsed] = useState(0)
+  // const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  // useEffect(() => {
+  //   if (isActive && activeSession) {
+  //     const start = new Date(activeSession.started_at).getTime()
+  //     setElapsed(Math.floor((Date.now() - start) / 1000))
+  //     intervalRef.current = setInterval(() => {
+  //       setElapsed(Math.floor((Date.now() - start) / 1000))
+  //     }, 1000)
+  //   } else {
+  //     if (intervalRef.current) clearInterval(intervalRef.current)
+  //     setElapsed(0)
+  //   }
+  //   return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
+  // }, [isActive, activeSession?.started_at])
+  // const fmt = (s: number) =>
+  //   `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`
 
   return (
     <div style={{
-      background: isDone ? '#0d0d0d' : isActive ? '#141414' : '#0f0f0f',
-      border: `1px solid ${isActive ? catColor + '60' : isPinned ? catColor + '33' : '#1e1e1e'}`,
+      background: isDone ? '#0d0d0d' : '#0f0f0f',
+      border: `1px solid ${isPinned ? catColor + '33' : '#1e1e1e'}`,
       borderLeft: `3px solid ${isDone ? '#ffffff' : isPinned ? catColor : '#ffffff'}`,
       borderRadius: '8px',
       padding: '12px 14px',
@@ -385,16 +384,17 @@ function PriorityTaskCard({
           }}>
             {task.title}
           </p>
+          {/* Désactivé : affichage du chrono en cours de session
           {isActive && (
             <div style={{ marginTop: '8px', fontFamily: 'var(--font-mono)', fontSize: '22px', color: catColor }}>
               {fmt(elapsed)}
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Actions */}
         <div style={{ display: 'flex', gap: '5px', flexShrink: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          {/* Timer — bouton principal, large */}
+          {/* Désactivé : boutons Démarrer / Pause (timer de session)
           {!isDone && !isActive && (
             <button
               onClick={() => onStart(task)}
@@ -413,7 +413,7 @@ function PriorityTaskCard({
             >
               ⏸ Pause
             </button>
-          )}
+          )} */}
 
           {/* Re-qualifier */}
           {!isDone && (

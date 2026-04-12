@@ -16,7 +16,7 @@ export function QualifyScreen() {
   const [loading, setLoading] = useState(false)
   const [sessionDone, setSessionDone] = useState(false)
 
-  /** Toutes les tâches non qualifiées, hors done/cancelled */
+  /** Tâches à qualifier : urgency, importance ou horizon manquant, hors done/cancelled */
   const queue: Task[] = tasks.filter(
     (t) => !t.is_qualified && t.status !== 'done' && t.status !== 'cancelled'
   )
@@ -28,8 +28,8 @@ export function QualifyScreen() {
   useEffect(() => {
     fetchCategories().then(setCategories)
     fetchDeliverables().then(setDeliverables)
-    // Charger toutes les tâches non qualifiées (tous statuts sauf done/cancelled)
-    fetchTasks().then((fetched) => {
+    // Charger toutes les tâches non qualifiées (hors done/cancelled)
+    fetchTasks({ qualified: false }).then((fetched) => {
       setTasks(fetched)
       setCurrentIndex(0)
       setSessionDone(false)
@@ -39,23 +39,24 @@ export function QualifyScreen() {
   async function handleQualify(payload: QualifyTaskPayload) {
     if (!currentTask) return
     setLoading(true)
-    // Capturer la longueur avant storeUpdate — qualifyTask retire la tâche de queue
-    const queueLength = queue.length
     try {
       const updated = await qualifyTask(currentTask.id, payload)
       storeUpdate(updated)
-      advance(queueLength)
+      // Après storeUpdate, la tâche qualifiée disparaît de queue.
+      // queue.length - 1 représente la taille de la queue après retrait.
+      const remainingCount = queue.length - 1
+      if (remainingCount <= 0 || currentIndex >= remainingCount) {
+        setSessionDone(true)
+      }
+      // Si currentIndex < remainingCount, l'index reste inchangé :
+      // la tâche suivante glisse à la même position dans la queue recalculée.
     } finally {
       setLoading(false)
     }
   }
 
   function handleSkip() {
-    advance(queue.length)
-  }
-
-  function advance(queueLength: number) {
-    if (currentIndex + 1 >= queueLength) {
+    if (currentIndex + 1 >= queue.length) {
       setSessionDone(true)
     } else {
       setCurrentIndex((i) => i + 1)

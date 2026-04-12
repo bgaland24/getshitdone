@@ -261,16 +261,17 @@ class TestEpinglage:
             assert task.status == "new"
             assert task.priority_current_date is None
 
-    def test_depinglage_avec_session_repasse_in_progress(self, ctx):
-        with ctx.app_context():
-            user = _make_user()
-            task = _make_task(user.id)
-            svc = TaskService()
-            svc.pin_task(task, _tomorrow(), user.id)
-            svc.start_task(task, user.id)
-            svc.pause_task(task, user.id)
-            svc.unpin_task(task)
-            assert task.status == "in_progress"
+    # Désactivé : timer démarrer/pause
+    # def test_depinglage_avec_session_repasse_in_progress(self, ctx):
+    #     with ctx.app_context():
+    #         user = _make_user()
+    #         task = _make_task(user.id)
+    #         svc = TaskService()
+    #         svc.pin_task(task, _tomorrow(), user.id)
+    #         svc.start_task(task, user.id)
+    #         svc.pause_task(task, user.id)
+    #         svc.unpin_task(task)
+    #         assert task.status == "in_progress"
 
     def test_depinglage_conserve_firstset_date(self, ctx):
         with ctx.app_context():
@@ -284,72 +285,72 @@ class TestEpinglage:
             assert task.priority_current_date is None
 
 
-# ─── Timer (sessions de travail) ──────────────────────────────────────────────
-
-class TestTimer:
-    """Démarrage, pause, reprise et session unique par utilisateur."""
-
-    def test_start_passe_en_in_progress(self, ctx):
-        with ctx.app_context():
-            user = _make_user()
-            task = _make_task(user.id)
-            TaskService().start_task(task, user.id)
-            assert task.status == "in_progress"
-
-    def test_start_cree_une_session(self, ctx):
-        with ctx.app_context():
-            user = _make_user()
-            task = _make_task(user.id)
-            session = TaskService().start_task(task, user.id)
-            assert session.task_id == task.id
-            assert session.stopped_at is None
-
-    def test_deux_starts_simultanes_leve_valueerror(self, ctx):
-        with ctx.app_context():
-            user = _make_user()
-            svc = TaskService()
-            t1 = _make_task(user.id)
-            t2 = _make_task(user.id)
-            svc.start_task(t1, user.id)
-            with pytest.raises(ValueError, match="session"):
-                svc.start_task(t2, user.id)
-
-    def test_pause_cloture_la_session(self, ctx):
-        with ctx.app_context():
-            user = _make_user()
-            task = _make_task(user.id)
-            svc = TaskService()
-            svc.start_task(task, user.id)
-            session = svc.pause_task(task, user.id)
-            assert session.stopped_at is not None
-            assert session.duration_minutes is not None
-
-    def test_pause_sur_tache_epinglee_repasse_prioritized(self, ctx):
-        with ctx.app_context():
-            user = _make_user()
-            task = _make_task(user.id)
-            svc = TaskService()
-            svc.pin_task(task, _tomorrow(), user.id)
-            svc.start_task(task, user.id)
-            svc.pause_task(task, user.id)
-            assert task.status == "prioritized"
-
-    def test_pause_sans_session_active_leve_valueerror(self, ctx):
-        with ctx.app_context():
-            user = _make_user()
-            task = _make_task(user.id)
-            with pytest.raises(ValueError, match="session"):
-                TaskService().pause_task(task, user.id)
-
-    def test_plusieurs_sessions_successives(self, ctx):
-        with ctx.app_context():
-            user = _make_user()
-            task = _make_task(user.id)
-            svc = TaskService()
-            for _ in range(3):
-                svc.start_task(task, user.id)
-                svc.pause_task(task, user.id)
-            assert len(task.work_sessions) == 3
+# Désactivé : timer démarrer/pause (sessions de travail)
+#
+# class TestTimer:
+#     """Démarrage, pause, reprise et session unique par utilisateur."""
+#
+#     def test_start_passe_en_in_progress(self, ctx):
+#         with ctx.app_context():
+#             user = _make_user()
+#             task = _make_task(user.id)
+#             TaskService().start_task(task, user.id)
+#             assert task.status == "in_progress"
+#
+#     def test_start_cree_une_session(self, ctx):
+#         with ctx.app_context():
+#             user = _make_user()
+#             task = _make_task(user.id)
+#             session = TaskService().start_task(task, user.id)
+#             assert session.task_id == task.id
+#             assert session.stopped_at is None
+#
+#     def test_deux_starts_simultanes_leve_valueerror(self, ctx):
+#         with ctx.app_context():
+#             user = _make_user()
+#             svc = TaskService()
+#             t1 = _make_task(user.id)
+#             t2 = _make_task(user.id)
+#             svc.start_task(t1, user.id)
+#             with pytest.raises(ValueError, match="session"):
+#                 svc.start_task(t2, user.id)
+#
+#     def test_pause_cloture_la_session(self, ctx):
+#         with ctx.app_context():
+#             user = _make_user()
+#             task = _make_task(user.id)
+#             svc = TaskService()
+#             svc.start_task(task, user.id)
+#             session = svc.pause_task(task, user.id)
+#             assert session.stopped_at is not None
+#             assert session.duration_minutes is not None
+#
+#     def test_pause_sur_tache_epinglee_repasse_prioritized(self, ctx):
+#         with ctx.app_context():
+#             user = _make_user()
+#             task = _make_task(user.id)
+#             svc = TaskService()
+#             svc.pin_task(task, _tomorrow(), user.id)
+#             svc.start_task(task, user.id)
+#             svc.pause_task(task, user.id)
+#             assert task.status == "prioritized"
+#
+#     def test_pause_sans_session_active_leve_valueerror(self, ctx):
+#         with ctx.app_context():
+#             user = _make_user()
+#             task = _make_task(user.id)
+#             with pytest.raises(ValueError, match="session"):
+#                 TaskService().pause_task(task, user.id)
+#
+#     def test_plusieurs_sessions_successives(self, ctx):
+#         with ctx.app_context():
+#             user = _make_user()
+#             task = _make_task(user.id)
+#             svc = TaskService()
+#             for _ in range(3):
+#                 svc.start_task(task, user.id)
+#                 svc.pause_task(task, user.id)
+#             assert len(task.work_sessions) == 3
 
 
 # ─── Clôture ──────────────────────────────────────────────────────────────────
@@ -365,15 +366,16 @@ class TestCloture:
             assert task.status == "done"
             assert task.done_at is not None
 
-    def test_done_depuis_in_progress_ferme_session(self, ctx):
-        with ctx.app_context():
-            user = _make_user()
-            task = _make_task(user.id)
-            svc = TaskService()
-            svc.start_task(task, user.id)
-            svc.complete_task(task)
-            assert task.status == "done"
-            assert all(s.stopped_at is not None for s in task.work_sessions)
+    # Désactivé : timer démarrer/pause
+    # def test_done_depuis_in_progress_ferme_session(self, ctx):
+    #     with ctx.app_context():
+    #         user = _make_user()
+    #         task = _make_task(user.id)
+    #         svc = TaskService()
+    #         svc.start_task(task, user.id)
+    #         svc.complete_task(task)
+    #         assert task.status == "done"
+    #         assert all(s.stopped_at is not None for s in task.work_sessions)
 
     def test_done_depuis_prioritized(self, ctx):
         with ctx.app_context():
@@ -406,14 +408,15 @@ class TestAnnulation:
             svc.cancel_task(task)
             assert task.status == "cancelled"
 
-    def test_cancel_depuis_in_progress(self, ctx):
-        with ctx.app_context():
-            user = _make_user()
-            task = _make_task(user.id)
-            svc = TaskService()
-            svc.start_task(task, user.id)
-            svc.cancel_task(task)
-            assert task.status == "cancelled"
+    # Désactivé : timer démarrer/pause
+    # def test_cancel_depuis_in_progress(self, ctx):
+    #     with ctx.app_context():
+    #         user = _make_user()
+    #         task = _make_task(user.id)
+    #         svc = TaskService()
+    #         svc.start_task(task, user.id)
+    #         svc.cancel_task(task)
+    #         assert task.status == "cancelled"
 
     def test_cancel_depuis_done_leve_valueerror(self, ctx):
         with ctx.app_context():
@@ -431,7 +434,7 @@ class TestCycleComplet:
     """Scénarios end-to-end représentatifs."""
 
     def test_scenario_nominal(self, ctx):
-        """new → qualifiée → épinglée → démarrée → pausée → terminée."""
+        """new → qualifiée → épinglée → terminée."""
         with ctx.app_context():
             user = _make_user()
             svc = TaskService()
@@ -446,17 +449,15 @@ class TestCycleComplet:
             assert task.status == "prioritized"
             assert task.priority_firstset_date == _tomorrow()
 
-            svc.start_task(task, user.id)
-            assert task.status == "in_progress"
+            # svc.start_task(task, user.id)       # désactivé : timer
+            # assert task.status == "in_progress"
+            # svc.pause_task(task, user.id)        # désactivé : timer
+            # assert task.status == "prioritized"
+            # svc.start_task(task, user.id)        # désactivé : timer
 
-            svc.pause_task(task, user.id)
-            assert task.status == "prioritized"  # était épinglée → retour prioritized
-
-            svc.start_task(task, user.id)
             svc.complete_task(task)
             assert task.status == "done"
             assert task.done_at is not None
-            assert len(task.work_sessions) == 2
 
     def test_scenario_tache_delegable(self, ctx):
         """Tâche délégable : qualifiée, épinglée, marquée done sans timer."""

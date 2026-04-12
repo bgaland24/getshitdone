@@ -1,7 +1,7 @@
 # GetShitDone
 
 Application web de gestion de tâches orientée comportement intentionnel.
-Rends l'intentionnalité plus facile que la réactivité.
+Augmente le temps passé à faire ce que tu as décidé de faire
 
 ---
 

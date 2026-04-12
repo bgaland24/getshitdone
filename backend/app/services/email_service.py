@@ -27,7 +27,7 @@ class EmailService:
 
         body_text = (
             f"Bonjour,\n\n"
-            f"Vous avez demandé à réinitialiser votre mot de passe sur GetShitDone.\n\n"
+            f"Vous avez demandé à réinitialiser votre mot de passe sur Intent.\n\n"
             f"Cliquez sur le lien ci-dessous pour choisir un nouveau mot de passe :\n"
             f"{reset_link}\n\n"
             f"Ce lien est valable 15 minutes et ne peut être utilisé qu'une seule fois.\n\n"

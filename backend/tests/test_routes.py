@@ -171,56 +171,51 @@ class TestPinUnpinRoutes:
         assert resp.status_code == 400
 
 
-# ─── Actions tâches — timer via routes HTTP ──────────────────────────────────
-
-class TestTimerRoutes:
-    """POST /api/tasks/<id>/start et /pause."""
-
-    def test_start_retourne_task_et_session(self, client):
-        token = register_and_login(client, "start1@test.com")
-        task = create_task(client, token)
-
-        resp = client.post(f"/api/tasks/{task['id']}/start", headers=auth(token))
-        assert resp.status_code == 200
-        data = resp.get_json()["data"]
-        assert data["task"]["status"] == "in_progress"
-        assert data["session"]["stopped_at"] is None
-
-    def test_start_deux_fois_retourne_422(self, client):
-        """Démarrer deux tâches simultanément → 422 sur la seconde."""
-        token = register_and_login(client, "start2@test.com")
-        t1 = create_task(client, token, "T1")
-        t2 = create_task(client, token, "T2")
-
-        client.post(f"/api/tasks/{t1['id']}/start", headers=auth(token))
-        resp = client.post(f"/api/tasks/{t2['id']}/start", headers=auth(token))
-        assert resp.status_code == 422
-
-    def test_start_tache_done_retourne_400(self, client):
-        token = register_and_login(client, "start3@test.com")
-        task = create_task(client, token)
-        client.post(f"/api/tasks/{task['id']}/done", headers=auth(token))
-
-        resp = client.post(f"/api/tasks/{task['id']}/start", headers=auth(token))
-        assert resp.status_code == 400
-
-    def test_pause_retourne_task_et_session_cloturee(self, client):
-        token = register_and_login(client, "pause1@test.com")
-        task = create_task(client, token)
-
-        client.post(f"/api/tasks/{task['id']}/start", headers=auth(token))
-        resp = client.post(f"/api/tasks/{task['id']}/pause", headers=auth(token))
-        assert resp.status_code == 200
-        data = resp.get_json()["data"]
-        assert data["session"]["stopped_at"] is not None
-        assert data["session"]["duration_minutes"] is not None
-
-    def test_pause_sans_session_active_retourne_422(self, client):
-        token = register_and_login(client, "pause2@test.com")
-        task = create_task(client, token)
-
-        resp = client.post(f"/api/tasks/{task['id']}/pause", headers=auth(token))
-        assert resp.status_code == 422
+# Désactivé : timer démarrer/pause via routes HTTP
+#
+# class TestTimerRoutes:
+#     """POST /api/tasks/<id>/start et /pause."""
+#
+#     def test_start_retourne_task_et_session(self, client):
+#         token = register_and_login(client, "start1@test.com")
+#         task = create_task(client, token)
+#         resp = client.post(f"/api/tasks/{task['id']}/start", headers=auth(token))
+#         assert resp.status_code == 200
+#         data = resp.get_json()["data"]
+#         assert data["task"]["status"] == "in_progress"
+#         assert data["session"]["stopped_at"] is None
+#
+#     def test_start_deux_fois_retourne_422(self, client):
+#         """Démarrer deux tâches simultanément → 422 sur la seconde."""
+#         token = register_and_login(client, "start2@test.com")
+#         t1 = create_task(client, token, "T1")
+#         t2 = create_task(client, token, "T2")
+#         client.post(f"/api/tasks/{t1['id']}/start", headers=auth(token))
+#         resp = client.post(f"/api/tasks/{t2['id']}/start", headers=auth(token))
+#         assert resp.status_code == 422
+#
+#     def test_start_tache_done_retourne_400(self, client):
+#         token = register_and_login(client, "start3@test.com")
+#         task = create_task(client, token)
+#         client.post(f"/api/tasks/{task['id']}/done", headers=auth(token))
+#         resp = client.post(f"/api/tasks/{task['id']}/start", headers=auth(token))
+#         assert resp.status_code == 400
+#
+#     def test_pause_retourne_task_et_session_cloturee(self, client):
+#         token = register_and_login(client, "pause1@test.com")
+#         task = create_task(client, token)
+#         client.post(f"/api/tasks/{task['id']}/start", headers=auth(token))
+#         resp = client.post(f"/api/tasks/{task['id']}/pause", headers=auth(token))
+#         assert resp.status_code == 200
+#         data = resp.get_json()["data"]
+#         assert data["session"]["stopped_at"] is not None
+#         assert data["session"]["duration_minutes"] is not None
+#
+#     def test_pause_sans_session_active_retourne_422(self, client):
+#         token = register_and_login(client, "pause2@test.com")
+#         task = create_task(client, token)
+#         resp = client.post(f"/api/tasks/{task['id']}/pause", headers=auth(token))
+#         assert resp.status_code == 422
 
 
 # ─── Actions tâches — done/undone/cancel ─────────────────────────────────────

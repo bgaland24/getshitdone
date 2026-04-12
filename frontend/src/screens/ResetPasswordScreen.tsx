@@ -95,7 +95,7 @@ export function ResetPasswordScreen() {
           intent<span style={{ color: 'var(--color-accent)' }}>.</span>
         </div>
         <p style={{ fontSize: '13px', color: '#ffffff' }}>
-          Rends l'intentionnalité plus facile que la réactivité.
+          Augmente le temps passé à faire ce que tu as décidé de faire
         </p>
       </div>
 

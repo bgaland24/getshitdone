@@ -4,10 +4,12 @@
 
 import { useNavigate } from 'react-router-dom'
 import { useTaskStore } from '../store/taskStore'
+import { useAuthStore } from '../store/authStore'
 
 export function Header() {
   const navigate = useNavigate()
   const activeSession = useTaskStore((s) => s.activeSession)
+  const clearAuth = useAuthStore((s) => s.clearAuth)
 
   return (
     <header
@@ -39,8 +41,25 @@ export function Header() {
         )}
       </div>
 
-      {/* Droite : bouton Param */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+      {/* Droite : bouton Déconnexion + bouton Param */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+        <button
+          onClick={() => { clearAuth(); navigate('/login', { replace: true }) }}
+          aria-label="Se déconnecter"
+          style={{
+            background: 'none',
+            border: '1px solid rgba(255,255,255,0.3)',
+            borderRadius: '6px',
+            padding: '5px 10px',
+            color: '#aaaaaa',
+            fontSize: '11px',
+            fontWeight: 600,
+            letterSpacing: '0.06em',
+            cursor: 'pointer',
+          }}
+        >
+          QUITTER
+        </button>
         <button
           onClick={() => navigate('/manage')}
           aria-label="Paramètres"

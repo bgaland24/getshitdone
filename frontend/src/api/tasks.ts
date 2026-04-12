@@ -58,17 +58,18 @@ export async function unpinTask(id: string): Promise<Task> {
   return data
 }
 
-/** Démarre une session de travail sur la tâche */
-export async function startTask(id: string): Promise<{ task: Task; session: object }> {
-  const { data } = await apiClient.post<{ task: Task; session: object }>(`/tasks/${id}/start`)
-  return data
-}
+// Désactivé : timer démarrer/pause
+// /** Démarre une session de travail sur la tâche */
+// export async function startTask(id: string): Promise<{ task: Task; session: object }> {
+//   const { data } = await apiClient.post<{ task: Task; session: object }>(`/tasks/${id}/start`)
+//   return data
+// }
 
-/** Met en pause la session active */
-export async function pauseTask(id: string): Promise<{ task: Task; session: object }> {
-  const { data } = await apiClient.post<{ task: Task; session: object }>(`/tasks/${id}/pause`)
-  return data
-}
+// /** Met en pause la session active */
+// export async function pauseTask(id: string): Promise<{ task: Task; session: object }> {
+//   const { data } = await apiClient.post<{ task: Task; session: object }>(`/tasks/${id}/pause`)
+//   return data
+// }
 
 /** Marque la tâche comme terminée */
 export async function doneTask(id: string): Promise<Task> {
