@@ -5,6 +5,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useTaskStore } from '../store/taskStore'
 import { useAuthStore } from '../store/authStore'
+import { TUTORIAL_TARGETS, TUTORIAL_STORAGE_KEY } from '../constants'
 
 export function Header() {
   const navigate = useNavigate()
@@ -41,7 +42,7 @@ export function Header() {
         )}
       </div>
 
-      {/* Droite : bouton Déconnexion + bouton Param */}
+      {/* Droite : bouton Déconnexion + bouton Tutoriel + bouton Param */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
         <button
           onClick={() => { clearAuth(); navigate('/login', { replace: true }) }}
@@ -61,7 +62,28 @@ export function Header() {
           QUITTER
         </button>
         <button
+          onClick={() => {
+            window.localStorage.removeItem(TUTORIAL_STORAGE_KEY)
+            window.dispatchEvent(new CustomEvent('intent:restart-tutorial'))
+          }}
+          aria-label="Relancer le tutoriel"
+          style={{
+            background: 'none',
+            border: '1px solid rgba(255,255,255,0.2)',
+            borderRadius: '6px',
+            padding: '5px 10px',
+            color: '#888888',
+            fontSize: '11px',
+            fontWeight: 600,
+            letterSpacing: '0.06em',
+            cursor: 'pointer',
+          }}
+        >
+          TUTO
+        </button>
+        <button
           onClick={() => navigate('/manage')}
+          data-tutorial={TUTORIAL_TARGETS.PARAM}
           aria-label="Paramètres"
           style={{
             background: 'none',

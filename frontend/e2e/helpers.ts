@@ -41,6 +41,8 @@ export async function loginInBrowser(page: Page, email: string, password = 'test
   await page.getByPlaceholder('••••••••').fill(password)
   await page.getByRole('button', { name: /Se connecter/i }).click()
   await expect(page).toHaveURL(/\/capture/, { timeout: 8_000 })
+  // Désactive le tutoriel first-run pour éviter qu'il interfère avec les locators
+  await page.evaluate(() => localStorage.setItem('gsd-tutorial-done', '1'))
 }
 
 /* ─── Création de données via API ────────────────────────────────────────── */

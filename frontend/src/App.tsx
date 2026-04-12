@@ -18,6 +18,7 @@ import { LoginScreen }          from './screens/LoginScreen'
 import { ManageScreen }          from './screens/ManageScreen'
 import { ForgotPasswordScreen }  from './screens/ForgotPasswordScreen'
 import { ResetPasswordScreen }   from './screens/ResetPasswordScreen'
+import { TutorialOverlay }       from './components/TutorialOverlay'
 
 /** Wrapper qui redirige vers /login si l'utilisateur n'est pas connecté */
 function ProtectedLayout() {
@@ -46,6 +47,7 @@ function ProtectedLayout() {
 
       {/* Bottom navigation fixe */}
       <BottomNav />
+      <TutorialOverlay />
     </div>
   )
 }

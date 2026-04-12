@@ -67,7 +67,7 @@ export function ResetPasswordScreen() {
     setState('loading')
 
     try {
-      await resetPassword(token, password)
+      await resetPassword(token!, password)
       setState('success')
     } catch (err: unknown) {
       const message =

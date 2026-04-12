@@ -120,7 +120,7 @@ export function PrioritiesScreen() {
     setLoading(true)
     try {
       storeUpdate(await doneTask(task.id))
-      setActiveSession(null)
+      // setActiveSession(null) // désactivé : timer démarrer/pause
     } finally { setLoading(false) }
   }
 

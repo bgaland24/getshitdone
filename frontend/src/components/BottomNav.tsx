@@ -4,7 +4,7 @@
  */
 
 import { NavLink } from 'react-router-dom'
-import { ROUTES } from '../constants'
+import { ROUTES, TUTORIAL_TARGETS } from '../constants'
 import { useTaskStore } from '../store/taskStore'
 
 interface NavItem {
@@ -12,6 +12,7 @@ interface NavItem {
   label: string
   icon: string
   badge?: number
+  tutorialId?: string
 }
 
 export function BottomNav() {
@@ -24,10 +25,10 @@ export function BottomNav() {
   const unqualifiedCount = tasks.filter((t) => !t.is_qualified).length
 
   const navItems: NavItem[] = [
-    { route: ROUTES.CAPTURE,    label: 'Capture',    icon: '✦', badge: unorganizedCount || undefined },
-    { route: ROUTES.QUALIFY,    label: 'Qualifier',  icon: '◈', badge: unqualifiedCount || undefined },
-    { route: ROUTES.ORGANIZE,   label: 'Organiser',  icon: '≡' },
-    { route: ROUTES.PRIORITIES, label: 'Priorités',  icon: '◎' },
+    { route: ROUTES.CAPTURE,    label: 'Capture',    icon: '✦', badge: unorganizedCount || undefined, tutorialId: TUTORIAL_TARGETS.CAPTURE },
+    { route: ROUTES.QUALIFY,    label: 'Qualifier',  icon: '◈', badge: unqualifiedCount || undefined, tutorialId: TUTORIAL_TARGETS.QUALIFY },
+    { route: ROUTES.ORGANIZE,   label: 'Organiser',  icon: '≡', tutorialId: TUTORIAL_TARGETS.ORGANIZE },
+    { route: ROUTES.PRIORITIES, label: 'Priorités',  icon: '◎', tutorialId: TUTORIAL_TARGETS.PRIORITIES },
   ]
 
   return (
@@ -44,6 +45,7 @@ export function BottomNav() {
         <NavLink
           key={item.route}
           to={item.route}
+          data-tutorial={item.tutorialId}
           className="relative flex flex-col items-center gap-1 px-4 py-1 transition-colors"
           style={({ isActive }) => ({
             color: isActive ? 'var(--color-accent)' : '#ffffff',

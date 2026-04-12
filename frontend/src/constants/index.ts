@@ -83,6 +83,28 @@ export const EFFICIENT_THRESHOLD_MINUTES = 5
 /** Fréquence de rafraîchissement du timer actif (en ms) */
 export const TIMER_REFRESH_INTERVAL_MS = 1000
 
+/* ─── Tutorial first-run ─────────────────────────────────────────────── */
+
+/** Clé localStorage — présence indique que le tutoriel a été vu ou passé */
+export const TUTORIAL_STORAGE_KEY = 'gsd-tutorial-done'
+
+/** Valeur stockée lorsque le tutoriel est terminé */
+export const TUTORIAL_DONE_VALUE = '1'
+
+/** Nom de l'attribut HTML utilisé pour localiser les éléments cibles */
+export const TUTORIAL_TARGET_ATTR = 'data-tutorial'
+
+/** Identifiants des éléments ciblés par le tutoriel */
+export const TUTORIAL_TARGETS = {
+  CAPTURE:    'capture-tab',
+  QUALIFY:    'qualify-tab',
+  ORGANIZE:   'organize-tab',
+  PRIORITIES: 'priorities-tab',
+  PARAM:      'param-button',
+} as const
+
+export type TutorialTarget = (typeof TUTORIAL_TARGETS)[keyof typeof TUTORIAL_TARGETS]
+
 /* ─── Couleurs par défaut ────────────────────────────────────────────── */
 
 export const DEFAULT_CATEGORY_COLOR = '#6b7280'
